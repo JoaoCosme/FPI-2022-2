@@ -1,3 +1,4 @@
+use gtk::Align;
 use gtk::ApplicationWindow;
 use gtk::Button;
 use gtk::prelude::*;
@@ -20,6 +21,7 @@ fn build_ui(app: &Application){
     .margin_bottom(12)
     .margin_start(12)
     .margin_end(12)
+    .halign(Align::Start)
     .build();
 
     button.connect_clicked(move |button| {
