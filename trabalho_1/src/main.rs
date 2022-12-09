@@ -1,14 +1,17 @@
 use gtk::Align;
 use gtk::ApplicationWindow;
 use gtk::Button;
+use gtk::Image;
 use gtk::prelude::*;
 use gtk::Application;
 
 const APP_ID : &str = "fpi.trab1";
 
 fn main() {
+    
+    
     let app = Application::builder().application_id(APP_ID).build();
-
+    
     app.connect_activate(build_ui);
 
     app.run();
@@ -22,6 +25,7 @@ fn build_ui(app: &Application){
     .margin_start(12)
     .margin_end(12)
     .halign(Align::Start)
+    .valign(Align::Start)
     .build();
 
     button.connect_clicked(move |button| {
@@ -34,5 +38,15 @@ fn build_ui(app: &Application){
     .child(&button)
     .build();
 
-    window.present();
+    let image = Image::from_file(String::from("./test_images/Gramado_22k.jpg"));
+    let window2 = ApplicationWindow::builder()
+    .application(app)
+    .title("FPI - Joao Cosme")
+    .child(&image)
+    .build();    
+    app.add_window(&window2);
+    app.add_window(&window);
+    dbg!(image);
+    // window.present();
+    window2.present();
 }
