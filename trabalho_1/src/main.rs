@@ -6,6 +6,7 @@ use gtk::prelude::*;
 use gtk::Application;
 
 const APP_ID : &str = "fpi.trab1";
+const IMAGE_PATH: &str = "./src/test_images/Gramado_22k.jpg";
 
 fn main() {
     
@@ -38,7 +39,7 @@ fn build_ui(app: &Application){
     .child(&button)
     .build();
 
-    let image = Image::from_file(String::from("./test_images/Gramado_22k.jpg"));
+    let image = Image::from_file(String::from(IMAGE_PATH));
     let window2 = ApplicationWindow::builder()
     .application(app)
     .title("FPI - Joao Cosme")
@@ -46,7 +47,6 @@ fn build_ui(app: &Application){
     .build();    
     app.add_window(&window2);
     app.add_window(&window);
-    dbg!(image);
     // window.present();
     window2.present();
 }
