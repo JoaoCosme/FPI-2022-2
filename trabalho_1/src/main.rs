@@ -1,52 +1,23 @@
-use gtk::Align;
-use gtk::ApplicationWindow;
-use gtk::Button;
-use gtk::Image;
-use gtk::prelude::*;
-use gtk::Application;
+use image::{GenericImageView, ImageBuffer, DynamicImage, Pixel, Rgba, Luma, Rgb};
 
-const APP_ID : &str = "fpi.trab1";
-const IMAGE_PATH: &str = "./src/test_images/Gramado_22k.jpg";
+fn main(){
+  let img = image::open("./src/test_images/Gramado_22k.jpg")
+  .expect("Should open image");
+  
+  let (w,h) = img.dimensions();
+  let mut output = ImageBuffer::new(w,h);
 
-fn main() {
-    
-    
-    let app = Application::builder().application_id(APP_ID).build();
-    
-    app.connect_activate(build_ui);
+  for (x,y,pixel) in img.pixels(){
+    let pixels = pixel.to_rgb().0;
+    let red = pixels[0] as f64;
+    let green = pixels[1] as f64;
+    let blue = pixels[2] as f64;
 
-    app.run();
-}
-
-fn build_ui(app: &Application){
-    let button = Button::builder()
-    .label("Press me!")
-    .margin_top(12)
-    .margin_bottom(12)
-    .margin_start(12)
-    .margin_end(12)
-    .halign(Align::Start)
-    .valign(Align::Start)
-    .build();
-
-    button.connect_clicked(move |button| {
-        button.set_label("Hello World!")
+    let new_val = 0.299*red + 0.587*green + 0.114*blue;
+    let new_val = new_val as u8;
+    output.put_pixel(x, y, Rgb{
+      0:[new_val,new_val,new_val]
     });
-    
-    let window = ApplicationWindow::builder()
-    .application(app)
-    .title("FPI - Joao Cosme")
-    .child(&button)
-    .build();
-
-    let image = Image::from_file(String::from(IMAGE_PATH));
-    let window2 = ApplicationWindow::builder()
-    .application(app)
-    .title("FPI - Joao Cosme")
-    .child(&image)
-    .build();    
-    app.add_window(&window2);
-    app.add_window(&window);
-    // window.present();
-    window2.present();
+  }
+  output.save("./image.jpeg").expect("Should save image");
 }
