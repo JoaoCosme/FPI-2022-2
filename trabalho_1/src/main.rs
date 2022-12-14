@@ -1,5 +1,6 @@
 use image::{GenericImageView, ImageBuffer, DynamicImage, Pixel, Rgba, Luma, Rgb};
 const IMAGE_SIZE:usize = 1000;
+use plotters::prelude::*;
 
 fn main(){
   let img = image::open("./src/test_images/Gramado_22k.jpg")
@@ -19,7 +20,8 @@ fn main(){
       0:[gray_value,gray_value,gray_value]
     });
   }
-  let hist = make_histogram(&gray_image);
+  let hist = make_histogram(&output);
+  draw_histogram(&hist);
   output.save("./image.jpeg").expect("Should save image");
 }
 
@@ -33,12 +35,36 @@ fn to_grayscale(pixels:&[u8;3]) -> u8{
     return new_val;
 }
 
-fn make_histogram(gray_image:&[[u8;IMAGE_SIZE];IMAGE_SIZE]) -> [i32;256]{
-  let mut histogram:[i32;256] = [0; 256];
-  for x in 0..IMAGE_SIZE{
-    for y in 0..IMAGE_SIZE{
-      histogram[gray_image[x][y] as usize] +=1;
+fn make_histogram(gray_image:&ImageBuffer<Rgb<u8>,Vec<u8>>) -> [usize;256]{
+  let mut histogram:[usize;256] = [0; 256];
+  for x in 0..gray_image.width(){
+    for y in 0..gray_image.height(){
+      let value = gray_image.get_pixel(x, y).to_rgb().0[0];
+      histogram[value as usize] +=1;
     }
   }
   return histogram;
+}
+
+fn draw_histogram(histogram:&[usize;256]){
+  let maxY = histogram.iter().cloned().fold(0 as usize, usize::max);
+  let root_area = BitMapBackend::new("./hist.jpeg",(600,400)).into_drawing_area();
+  root_area.fill(&WHITE).unwrap();
+  let mut ctx = ChartBuilder::on(&root_area)
+  .set_label_area_size(LabelAreaPosition::Left, 40)
+  .set_label_area_size(LabelAreaPosition::Bottom, 40)
+  .caption("Histograma",("sans-serif",40))
+  .build_cartesian_2d((0..256).into_segmented(), 0..maxY)
+  .unwrap();
+
+  ctx.configure_mesh().draw().unwrap();
+
+
+  ctx.draw_series((0..).zip(histogram.iter()).map(|(x,y)|{
+    let x0 = SegmentValue::Exact(x);
+    let x1 = SegmentValue::Exact(x+1);
+    let mut bar = Rectangle::new([(x0,0),(x1,*y)],BLUE.filled());
+    bar.set_margin(0, 0, 5, 5);
+    bar
+  })).unwrap();
 }
