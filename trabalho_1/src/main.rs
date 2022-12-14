@@ -11,7 +11,7 @@ fn main(){
 
   for (x,y,pixel) in img.pixels(){
     let pixels = pixel.to_rgb().0;
-    let gray_value = to_grayscale(pixels);
+    let gray_value = to_grayscale(&pixels);
     let x = x as usize;
     let y = y as usize;
     gray_image[x][y] = gray_value;
@@ -19,11 +19,11 @@ fn main(){
       0:[gray_value,gray_value,gray_value]
     });
   }
-  let hist = make_histogram(gray_image);
+  let hist = make_histogram(&gray_image);
   output.save("./image.jpeg").expect("Should save image");
 }
 
-fn to_grayscale(pixels:[u8;3]) -> u8{
+fn to_grayscale(pixels:&[u8;3]) -> u8{
     let red = pixels[0] as f64;
     let green = pixels[1] as f64;
     let blue = pixels[2] as f64;
@@ -33,7 +33,7 @@ fn to_grayscale(pixels:[u8;3]) -> u8{
     return new_val;
 }
 
-fn make_histogram(gray_image:[[u8;IMAGE_SIZE];IMAGE_SIZE]) -> [i32;256]{
+fn make_histogram(gray_image:&[[u8;IMAGE_SIZE];IMAGE_SIZE]) -> [i32;256]{
   let mut histogram:[i32;256] = [0; 256];
   for x in 0..IMAGE_SIZE{
     for y in 0..IMAGE_SIZE{
