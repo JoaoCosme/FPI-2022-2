@@ -1,4 +1,4 @@
-use image::{DynamicImage, GenericImageView, ImageBuffer, Luma, Pixel, Rgb, Rgba};
+use image::{DynamicImage, GenericImageView, ImageBuffer, Luma, Pixel, Rgb, Rgba, imageops::flip_vertical_in_place};
 const IMAGE_SIZE: usize = 1000;
 const COLOR_NUMBER: usize = 256;
 use plotters::prelude::*;
@@ -6,8 +6,8 @@ use plotters::prelude::*;
 fn main() {
     let img = image::open("./src/test_images/Gramado_22k.jpg").expect("Should open image");
 
-    let (w, h) = img.dimensions();
-    let mut output = ImageBuffer::new(w, h);
+    let (width, h) = img.dimensions();
+    let mut output = ImageBuffer::new(width, h);
     let mut gray_image = [[0; IMAGE_SIZE]; IMAGE_SIZE];
 
     for (x, y, pixel) in img.pixels() {
@@ -27,6 +27,8 @@ fn main() {
     let hist = make_histogram(&output);
     draw_histogram(&hist);
     output.save("./image.jpeg").expect("Should save image");
+    let image = horizontal_flip(&output);
+    image.save("./flip.jpeg").expect("Should save image");
 }
 
 fn to_grayscale(pixels: &[u8; 3]) -> u8 {
@@ -71,4 +73,18 @@ fn draw_histogram(histogram: &[usize; COLOR_NUMBER]) {
         bar
     }))
     .unwrap();
+}
+
+fn horizontal_flip(gray_image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffer<Rgb<u8>, Vec<u8>>{
+  let width = gray_image.width();
+  
+  let mut output: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(width, gray_image.height());
+  for x in 0..width{
+    for y in 0..gray_image.height(){
+      output.put_pixel(x, y, gray_image.get_pixel(width-x-1 as u32, y).clone());
+      output.put_pixel(width-x-1, y as u32, gray_image.get_pixel(x, y).clone());
+    }
+  }
+
+  return output;
 }
