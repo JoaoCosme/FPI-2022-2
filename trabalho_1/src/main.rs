@@ -1,4 +1,4 @@
-use image::{DynamicImage, GenericImageView, ImageBuffer, Luma, Pixel, Rgb, Rgba, imageops::flip_vertical_in_place};
+use image::{DynamicImage, GenericImageView, ImageBuffer, Luma, Pixel, Rgb, Rgba, imageops::{flip_vertical_in_place, flip_horizontal}};
 const IMAGE_SIZE: usize = 1000;
 const COLOR_NUMBER: usize = 256;
 use plotters::prelude::*;
@@ -24,12 +24,9 @@ fn main() {
             },
         );
     }
-    let hist = make_histogram(&output);
-    draw_histogram(&hist);
+    draw_histogram(&make_histogram(&output));
     output.save("./image.jpeg").expect("Should save image");
-    let image = horizontal_flip(&output);
-    // let image = horizontal_flip(&image);
-    image.save("./flip.jpeg").expect("Should save image");
+    horizontal_flip(&output).save("./flip.jpeg").expect("Should save image");
     vertical_flip(&output).save("./ver_flip.jpeg").expect("Should save image");
 }
 
