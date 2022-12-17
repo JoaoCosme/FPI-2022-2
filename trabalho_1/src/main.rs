@@ -30,6 +30,7 @@ fn main() {
     let image = horizontal_flip(&output);
     // let image = horizontal_flip(&image);
     image.save("./flip.jpeg").expect("Should save image");
+    vertical_flip(&output).save("./ver_flip.jpeg").expect("Should save image");
 }
 
 fn to_grayscale(pixels: &[u8; 3]) -> u8 {
@@ -86,6 +87,19 @@ fn horizontal_flip(gray_image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffer<Rg
       output.put_pixel(width-x-1, y as u32, gray_image.get_pixel(x, y).clone());
     }
   }
-
   return output;
 }
+
+
+fn vertical_flip(gray_image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffer<Rgb<u8>, Vec<u8>>{
+    let width = gray_image.width();
+    let height = gray_image.height();
+    let mut output: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(width, gray_image.height());
+    for x in 0..width{
+      for y in 0..height/2{
+        output.put_pixel(x, y, gray_image.get_pixel(x, height - 1 - y).clone());
+        output.put_pixel(x, height-y-1 as u32, gray_image.get_pixel(x, y).clone());
+      }
+    }
+    return output;
+  }
