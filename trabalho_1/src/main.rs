@@ -1,29 +1,32 @@
-use image::{DynamicImage, GenericImageView, ImageBuffer, Luma, Pixel, Rgb, Rgba, imageops::{flip_vertical_in_place, flip_horizontal}};
-const IMAGE_SIZE: usize = 1000;
+use image::{DynamicImage, GenericImageView, ImageBuffer, Pixel, Rgb};
 const COLOR_NUMBER: usize = 256;
 use plotters::prelude::*;
 
 fn main() {
     let img = image::open("./src/test_images/Underwater_53k.jpg").expect("Should open image");
-
-    let (width, h) = img.dimensions();
-    let mut output = ImageBuffer::new(width, h);
-    let mut gray_image:Vec<Vec<u8>> = vec![];
-
-    let (width,height) = img.dimensions();
-    for x in 0..width{
-        let mut line = vec![];
-        for y in 0..height{
-            let gray_pixel = to_grayscale(&img.get_pixel(x, y).to_rgb().0);
-            line.push(gray_pixel);
-            output.put_pixel(x, y, Rgb{0:[gray_pixel,gray_pixel,gray_pixel]});
-        }
-        gray_image.push(line)
-    }
+    let output = make_gray_image(&img);
     draw_histogram(&make_histogram(&output));
     output.save("./image.jpeg").expect("Should save image");
     horizontal_flip(&img.into_rgb8()).save("./flip.jpeg").expect("Should save image");
     vertical_flip(&output).save("./ver_flip.jpeg").expect("Should save image");
+}
+
+fn make_gray_image(img: &DynamicImage) -> ImageBuffer<Rgb<u8>,Vec<u8>>{
+    let (width, h) = img.dimensions();
+    let mut output = ImageBuffer::new(width, h);
+    let mut gray_image:Vec<Vec<u8>> = vec![];
+
+    let (width, height) = img.dimensions();
+    for x in 0..width {
+        let mut line = vec![];
+        for y in 0..height {
+            let gray_pixel = to_grayscale(&img.get_pixel(x, y).to_rgb().0);
+            line.push(gray_pixel);
+            output.put_pixel(x, y, Rgb { 0: [gray_pixel, gray_pixel, gray_pixel] });
+        }
+        gray_image.push(line)
+    }
+    return output;
 }
 
 fn to_grayscale(pixels: &[u8; 3]) -> u8 {
