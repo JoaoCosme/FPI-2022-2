@@ -8,38 +8,32 @@ fn main() {
     let (width, height) = img.dimensions();
     let width = width as i32;
     let height = height as i32;
-    let output = make_gray_image(&img);
+    make_ui(width, height);
+}
 
+fn make_ui(width: i32, height: i32) {
     let app = app::App::default();
     let mut window = Window::new(0, 0, width, height + 25, "Hello world!");
     let mut frame = Frame::new(0, 0, width, height, "");
     let mut image = SharedImage::load("./src/test_images/Underwater_53k.jpg").unwrap();
     image.scale(width, height, true, true);
     frame.set_image(Some(image));
-    let frame2 = Frame::new(width, 0, width, height, "");
-
-    output.save("./image.jpeg").expect("Should save image");
-
     let mut but_histogram = Button::default()
         .with_size((width - 10) / 4, 20)
         .below_of(&frame, 0)
         .with_label("Calculate Histogram");
-
     let mut but_horizontal = Button::default()
         .size_of(&but_histogram)
         .right_of(&but_histogram, 5)
         .with_label("Flip Horizontal");
-
     let mut but_vertical = Button::default()
         .size_of(&but_histogram)
         .right_of(&but_horizontal, 5)
         .with_label("Flip Vertical");
-
     let mut but_gray = Button::default()
         .size_of(&but_histogram)
         .right_of(&but_vertical, 5)
         .with_label("Gray Scale");
-
     but_horizontal.set_callback(move |_| {
         let img = image::open("./src/test_images/Underwater_53k.jpg")
             .expect("Should open image")
@@ -49,7 +43,6 @@ fn main() {
             .expect("Should save image");
         update_frame(width, height);
     });
-
     but_gray.set_callback(move |_| {
         let img = image::open("./src/test_images/Underwater_53k.jpg").expect("Should open image");
         make_gray_image(&img)
@@ -57,7 +50,6 @@ fn main() {
             .expect("Should save image");
         update_frame(width, height);
     });
-
     but_vertical.set_callback(move |_| {
         let img = image::open("./src/test_images/Underwater_53k.jpg").expect("Should open image").into_rgb8();
         vertical_flip(&img)
@@ -65,20 +57,14 @@ fn main() {
             .expect("Should save image");
         update_frame(width, height);
     });
-
     but_histogram.set_callback(move |_| {
         let img = image::open("./src/test_images/Underwater_53k.jpg").expect("Should open image");
         draw_histogram(&make_histogram(&make_gray_image(&img)),"./image.jpeg".to_string());
         update_frame(width, height);
     });
-
     window.make_resizable(false);
     window.show();
     app.run().ok();
-
-    // draw_histogram(&make_histogram(&output));
-    // horizontal_flip(&img.into_rgb8()).save("./flip.jpeg").expect("Should save image");
-    // vertical_flip(&output).save("./ver_flip.jpeg").expect("Should save image");
 }
 
 fn update_frame(width: i32, height: i32) {
