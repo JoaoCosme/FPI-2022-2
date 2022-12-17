@@ -28,6 +28,7 @@ fn main() {
     draw_histogram(&hist);
     output.save("./image.jpeg").expect("Should save image");
     let image = horizontal_flip(&output);
+    // let image = horizontal_flip(&image);
     image.save("./flip.jpeg").expect("Should save image");
 }
 
@@ -77,9 +78,9 @@ fn draw_histogram(histogram: &[usize; COLOR_NUMBER]) {
 
 fn horizontal_flip(gray_image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffer<Rgb<u8>, Vec<u8>>{
   let width = gray_image.width();
-  
+  let half = width/2;
   let mut output: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(width, gray_image.height());
-  for x in 0..width{
+  for x in 0..half{
     for y in 0..gray_image.height(){
       output.put_pixel(x, y, gray_image.get_pixel(width-x-1 as u32, y).clone());
       output.put_pixel(width-x-1, y as u32, gray_image.get_pixel(x, y).clone());
