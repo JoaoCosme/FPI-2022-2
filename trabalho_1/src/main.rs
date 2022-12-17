@@ -4,29 +4,25 @@ const COLOR_NUMBER: usize = 256;
 use plotters::prelude::*;
 
 fn main() {
-    let img = image::open("./src/test_images/Gramado_22k.jpg").expect("Should open image");
+    let img = image::open("./src/test_images/Underwater_53k.jpg").expect("Should open image");
 
     let (width, h) = img.dimensions();
     let mut output = ImageBuffer::new(width, h);
-    let mut gray_image = [[0; IMAGE_SIZE]; IMAGE_SIZE];
+    let mut gray_image:Vec<Vec<u8>> = vec![];
 
-    for (x, y, pixel) in img.pixels() {
-        let pixels = pixel.to_rgb().0;
-        let gray_value = to_grayscale(&pixels);
-        let x = x as usize;
-        let y = y as usize;
-        gray_image[x][y] = gray_value;
-        output.put_pixel(
-            x as u32,
-            y as u32,
-            Rgb {
-                0: [gray_value, gray_value, gray_value],
-            },
-        );
+    let (width,height) = img.dimensions();
+    for x in 0..width{
+        let mut line = vec![];
+        for y in 0..height{
+            let gray_pixel = to_grayscale(&img.get_pixel(x, y).to_rgb().0);
+            line.push(gray_pixel);
+            output.put_pixel(x, y, Rgb{0:[gray_pixel,gray_pixel,gray_pixel]});
+        }
+        gray_image.push(line)
     }
     draw_histogram(&make_histogram(&output));
     output.save("./image.jpeg").expect("Should save image");
-    horizontal_flip(&output).save("./flip.jpeg").expect("Should save image");
+    horizontal_flip(&img.into_rgb8()).save("./flip.jpeg").expect("Should save image");
     vertical_flip(&output).save("./ver_flip.jpeg").expect("Should save image");
 }
 
