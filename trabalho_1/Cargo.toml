@@ -9,7 +9,4 @@ edition = "2021"
 image = "0.24.5"
 show-image = "0.13.1"
 plotters = "0.3"
-gtk = { version = "0.5.4", package = "gtk4" }
-
-[build-dependencies]
-glib-build-tools = "0.16.3"
+fltk = "^1.3"

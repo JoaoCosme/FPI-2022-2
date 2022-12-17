@@ -1,57 +1,36 @@
-use gtk::glib::{MainContext, PRIORITY_DEFAULT, timeout_future_seconds};
-use gtk::prelude::*;
-use gtk::{Application, ApplicationWindow, Button};
 use image::{DynamicImage, GenericImageView, ImageBuffer, Pixel, Rgb};
 const COLOR_NUMBER: usize = 256;
 use plotters::prelude::*;
-use std::thread;
-use std::time::Duration;
-use gtk::glib;
+use fltk::{app, prelude::*, window::Window, frame::Frame,button::Button, image::SharedImage};
 
 fn main() {
     let img = image::open("./src/test_images/Underwater_53k.jpg").expect("Should open image");
+    let (widht, height) = img.dimensions();
+    let width = widht as i32;
+    let height = height as i32;
     let output = make_gray_image(&img);
+    let app = app::App::default();
+    let mut window = Window::new(0,0,width*2,height,"Hello world!");
+    let mut frame = Frame::new(0,0,width,height,"");
+    let mut image = SharedImage::load("./src/test_images/Underwater_53k.jpg").unwrap();
+    image.scale(width, height, true, true);
+    frame.set_image(Some(image));
 
-    let app = Application::builder().application_id("Trabalho-1").build();
-    app.connect_activate(build_ui);
+    output.save("./image.jpeg").expect("Should save image");
+    let mut frame2 = Frame::new(width,0,width,height,"Result");
 
-    app.run();
+    let mut image2 = SharedImage::load("./image.jpeg").unwrap();
+    image2.scale(width, height, true, true);
+    frame2.set_image(Some(image2));
+
+    window.make_resizable(false);
+    window.show();
+    app.run().ok();
+
 
     // draw_histogram(&make_histogram(&output));
-    // output.save("./image.jpeg").expect("Should save image");
     // horizontal_flip(&img.into_rgb8()).save("./flip.jpeg").expect("Should save image");
     // vertical_flip(&output).save("./ver_flip.jpeg").expect("Should save image");
-}
-
-fn build_ui(app: &Application) {
-    let button = Button::builder()
-        .label("Press me!")
-        .margin_top(12)
-        .margin_bottom(12)
-        .margin_start(12)
-        .margin_end(12)
-        .build();
-
-        // Connect to "clicked" signal of `button`
-        button.connect_clicked(move |button| {
-            let main_context = MainContext::default();
-            // The main loop executes the asynchronous block
-            main_context.spawn_local(glib::clone!(@weak button => async move {
-                // Deactivate the button until the operation is done
-                button.set_sensitive(false);
-                timeout_future_seconds(5).await;
-                // Activate the button again
-                button.set_sensitive(true);
-            }));
-        });
-
-    let window = ApplicationWindow::builder()
-        .application(app)
-        .title("GTK App")
-        .child(&button)
-        .build();
-
-    window.present();
 }
 
 fn make_gray_image(img: &DynamicImage) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
