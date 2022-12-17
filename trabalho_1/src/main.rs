@@ -28,7 +28,7 @@ fn main() {
     .below_of(&frame, 0)
     .with_label("Calculate Histogram");
 
-    let but_horizontal = Button::default()
+    let mut but_horizontal = Button::default()
     .size_of(&but_histogram)
     .right_of(&but_histogram, 5)
     .with_label("Flip Horizontal");
@@ -44,9 +44,22 @@ fn main() {
     .right_of(&but_vertical, 5)
     .with_label("Gray Scale");
 
+    let copy = img.into_rgb8().clone();
+
+    but_horizontal.set_callback(move |_| {
+            frame2.hide();  
+            horizontal_flip(&copy).save("./horizontal.jpeg").expect("Should save image");
+            let mut image2 = SharedImage::load("./horizontal.jpeg").unwrap();
+            image2.scale(width, height, true, true);
+            frame2.set_image(Some(image2));
+            frame2.show();
+    });
+
+
     window.make_resizable(false);
     window.show();
     app.run().ok();
+
 
 
     // draw_histogram(&make_histogram(&output));
