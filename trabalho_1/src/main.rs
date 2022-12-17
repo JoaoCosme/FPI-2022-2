@@ -1,20 +1,63 @@
+use gtk::glib::{MainContext, PRIORITY_DEFAULT, timeout_future_seconds};
+use gtk::prelude::*;
+use gtk::{Application, ApplicationWindow, Button};
 use image::{DynamicImage, GenericImageView, ImageBuffer, Pixel, Rgb};
 const COLOR_NUMBER: usize = 256;
 use plotters::prelude::*;
+use std::thread;
+use std::time::Duration;
+use gtk::glib;
 
 fn main() {
     let img = image::open("./src/test_images/Underwater_53k.jpg").expect("Should open image");
     let output = make_gray_image(&img);
-    draw_histogram(&make_histogram(&output));
-    output.save("./image.jpeg").expect("Should save image");
-    horizontal_flip(&img.into_rgb8()).save("./flip.jpeg").expect("Should save image");
-    vertical_flip(&output).save("./ver_flip.jpeg").expect("Should save image");
+
+    let app = Application::builder().application_id("Trabalho-1").build();
+    app.connect_activate(build_ui);
+
+    app.run();
+
+    // draw_histogram(&make_histogram(&output));
+    // output.save("./image.jpeg").expect("Should save image");
+    // horizontal_flip(&img.into_rgb8()).save("./flip.jpeg").expect("Should save image");
+    // vertical_flip(&output).save("./ver_flip.jpeg").expect("Should save image");
 }
 
-fn make_gray_image(img: &DynamicImage) -> ImageBuffer<Rgb<u8>,Vec<u8>>{
+fn build_ui(app: &Application) {
+    let button = Button::builder()
+        .label("Press me!")
+        .margin_top(12)
+        .margin_bottom(12)
+        .margin_start(12)
+        .margin_end(12)
+        .build();
+
+        // Connect to "clicked" signal of `button`
+        button.connect_clicked(move |button| {
+            let main_context = MainContext::default();
+            // The main loop executes the asynchronous block
+            main_context.spawn_local(glib::clone!(@weak button => async move {
+                // Deactivate the button until the operation is done
+                button.set_sensitive(false);
+                timeout_future_seconds(5).await;
+                // Activate the button again
+                button.set_sensitive(true);
+            }));
+        });
+
+    let window = ApplicationWindow::builder()
+        .application(app)
+        .title("GTK App")
+        .child(&button)
+        .build();
+
+    window.present();
+}
+
+fn make_gray_image(img: &DynamicImage) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
     let (width, h) = img.dimensions();
     let mut output = ImageBuffer::new(width, h);
-    let mut gray_image:Vec<Vec<u8>> = vec![];
+    let mut gray_image: Vec<Vec<u8>> = vec![];
 
     let (width, height) = img.dimensions();
     for x in 0..width {
@@ -22,7 +65,13 @@ fn make_gray_image(img: &DynamicImage) -> ImageBuffer<Rgb<u8>,Vec<u8>>{
         for y in 0..height {
             let gray_pixel = to_grayscale(&img.get_pixel(x, y).to_rgb().0);
             line.push(gray_pixel);
-            output.put_pixel(x, y, Rgb { 0: [gray_pixel, gray_pixel, gray_pixel] });
+            output.put_pixel(
+                x,
+                y,
+                Rgb {
+                    0: [gray_pixel, gray_pixel, gray_pixel],
+                },
+            );
         }
         gray_image.push(line)
     }
@@ -73,29 +122,28 @@ fn draw_histogram(histogram: &[usize; COLOR_NUMBER]) {
     .unwrap();
 }
 
-fn horizontal_flip(gray_image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffer<Rgb<u8>, Vec<u8>>{
-  let width = gray_image.width();
-  let half = width/2;
-  let mut output: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(width, gray_image.height());
-  for x in 0..half{
-    for y in 0..gray_image.height(){
-      output.put_pixel(x, y, gray_image.get_pixel(width-x-1 as u32, y).clone());
-      output.put_pixel(width-x-1, y as u32, gray_image.get_pixel(x, y).clone());
+fn horizontal_flip(gray_image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
+    let width = gray_image.width();
+    let half = width / 2;
+    let mut output: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(width, gray_image.height());
+    for x in 0..half {
+        for y in 0..gray_image.height() {
+            output.put_pixel(x, y, gray_image.get_pixel(width - x - 1 as u32, y).clone());
+            output.put_pixel(width - x - 1, y as u32, gray_image.get_pixel(x, y).clone());
+        }
     }
-  }
-  return output;
+    return output;
 }
 
-
-fn vertical_flip(gray_image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffer<Rgb<u8>, Vec<u8>>{
+fn vertical_flip(gray_image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
     let width = gray_image.width();
     let height = gray_image.height();
     let mut output: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(width, gray_image.height());
-    for x in 0..width{
-      for y in 0..height/2{
-        output.put_pixel(x, y, gray_image.get_pixel(x, height - 1 - y).clone());
-        output.put_pixel(x, height-y-1 as u32, gray_image.get_pixel(x, y).clone());
-      }
+    for x in 0..width {
+        for y in 0..height / 2 {
+            output.put_pixel(x, y, gray_image.get_pixel(x, height - 1 - y).clone());
+            output.put_pixel(x, height - y - 1 as u32, gray_image.get_pixel(x, y).clone());
+        }
     }
     return output;
-  }
+}
