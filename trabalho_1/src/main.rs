@@ -82,7 +82,7 @@ fn main() {
 }
 
 fn update_frame(width: i32, height: i32) {
-    let mut window = Window::new(width, 0, width, height + 25, "Hello world!");
+    let mut window = Window::new(width, 0, width, height + 25, "Result");
     let mut frame = Frame::new(0, 0, width, height, "");
     let mut image2 = SharedImage::load("./image.jpeg").unwrap();
     image2.scale(width, height, true, true);
