@@ -10,18 +10,39 @@ fn main() {
     let height = height as i32;
     let output = make_gray_image(&img);
     let app = app::App::default();
-    let mut window = Window::new(0,0,width*2,height,"Hello world!");
+    let mut window = Window::new(0,0,width*2,height+25,"Hello world!");
     let mut frame = Frame::new(0,0,width,height,"");
     let mut image = SharedImage::load("./src/test_images/Underwater_53k.jpg").unwrap();
     image.scale(width, height, true, true);
     frame.set_image(Some(image));
 
     output.save("./image.jpeg").expect("Should save image");
-    let mut frame2 = Frame::new(width,0,width,height,"Result");
+    let mut frame2 = Frame::new(width,0,width,height,"");
 
     let mut image2 = SharedImage::load("./image.jpeg").unwrap();
     image2.scale(width, height, true, true);
     frame2.set_image(Some(image2));
+
+    let but_histogram = Button::default()
+    .with_size((width-10)/2, 20)
+    .below_of(&frame, 0)
+    .with_label("Calculate Histogram");
+
+    let but_horizontal = Button::default()
+    .size_of(&but_histogram)
+    .right_of(&but_histogram, 5)
+    .with_label("Flip Horizontal");
+
+
+    let but_vertical = Button::default()
+    .size_of(&but_histogram)
+    .right_of(&but_horizontal, 5)
+    .with_label("Flip Vertical");
+
+    let but_gray = Button::default()
+    .size_of(&but_histogram)
+    .right_of(&but_vertical, 5)
+    .with_label("Gray Scale");
 
     window.make_resizable(false);
     window.show();
