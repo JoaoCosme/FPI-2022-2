@@ -1,27 +1,40 @@
 use image::{DynamicImage, GenericImageView, ImageBuffer, Pixel, Rgb};
 const COLOR_NUMBER: usize = 256;
-use fltk::{app, button::Button, frame::Frame, image::SharedImage, prelude::*, window::Window, dialog::{FileDialog, FileChooser, self}};
+use fltk::{app, button::Button, frame::Frame, image::SharedImage, prelude::*, window::Window, dialog::{FileDialog, FileChooser, self, FileChooserType}};
 use plotters::prelude::*;
+const SAVED_FILE : &'static str = "./loaded_image.jpeg";
 
 fn main() {
-    let img = image::open("./src/test_images/Underwater_53k.jpg").expect("Should open image");
-    let (width, height) = img.dimensions();
-    let width = width as i32;
-    let height = height as i32;
-    make_ui(width, height);
+    make_ui();
 }
 
-fn make_ui(width: i32, height: i32) {
+fn pick_file() {
+    let mut file_chooser = FileChooser::new(".", "*.{jpeg,jpg}", FileChooserType::Single, "Select a File!");
+    file_chooser.show();
+    while file_chooser.shown(){
+        app::wait();
+    }
+    image::open(file_chooser.value(0).expect("Should have choosen file")).expect("Should open image").save(SAVED_FILE).expect("Should save opened image");
+}
+
+fn make_ui() {
+    pick_file();
+    let img = image::open(SAVED_FILE).expect("Should open image");
+    let (width, height) = img.dimensions();
+    let window_width = (width+100).max(500) as i32;
+    let window_height = (height).max(400) as i32;
+    let width = width as i32;
+    let height = height as i32;
     let app = app::App::default();
-    let mut window = Window::new(0, 0, width, height + 25, "Hello world!");
-    let mut frame = Frame::new(0, 0, width, height, "");
-    let mut image = SharedImage::load("./src/test_images/Underwater_53k.jpg").unwrap();
+    let mut window = Window::new(0, 0, window_width, window_height+50, "Hello world!");
+    let mut frame = Frame::new(0, 0, width+100, height, "").center_of_parent();
+    let mut image = SharedImage::load(SAVED_FILE).unwrap();
     image.scale(width, height, true, true);
     frame.set_image(Some(image));
     let mut but_histogram = Button::default()
-        .with_size((width - 10) / 5, 20)
+        .with_size((width+100) / 5, 20)
         .below_of(&frame, 0)
-        .with_label("Calculate Histogram");
+        .with_label("Histogram");
     let mut but_horizontal = Button::default()
         .size_of(&but_histogram)
         .right_of(&but_histogram, 5)
@@ -36,40 +49,40 @@ fn make_ui(width: i32, height: i32) {
         .with_label("Gray Scale");
     let mut save_result = Button::default()
         .size_of(&but_histogram)
-        .right_of(&but_vertical, 5)
+        .right_of(&but_gray, 5)
         .with_label("Save Result");
     but_horizontal.set_callback(move |_| {
-        let img = image::open("./src/test_images/Underwater_53k.jpg")
+        let img = image::open(SAVED_FILE)
             .expect("Should open image")
             .into_rgb8();
         horizontal_flip(&img)
             .save("./image.jpeg")
             .expect("Should save image");
-        update_frame(width, height);
-    });
+            update_frame(window_width, window_height);
+        });
     but_gray.set_callback(move |_| {
-        let img = image::open("./src/test_images/Underwater_53k.jpg").expect("Should open image");
+        let img = image::open(SAVED_FILE).expect("Should open image");
         make_gray_image(&img)
             .save("./image.jpeg")
             .expect("Should save image");
-        update_frame(width, height);
-    });
+            update_frame(window_width, window_height);
+        });
     but_vertical.set_callback(move |_| {
-        let img = image::open("./src/test_images/Underwater_53k.jpg")
+        let img = image::open(SAVED_FILE)
             .expect("Should open image")
             .into_rgb8();
         vertical_flip(&img)
             .save("./image.jpeg")
             .expect("Should save image");
-        update_frame(width, height);
+        update_frame(window_width, window_height);
     });
     but_histogram.set_callback(move |_| {
-        let img = image::open("./src/test_images/Underwater_53k.jpg").expect("Should open image");
+        let img = image::open(SAVED_FILE).expect("Should open image");
         draw_histogram(
             &make_histogram(&make_gray_image(&img)),
             "./image.jpeg".to_string(),
         );
-        update_frame(width, height);
+        update_frame(window_width, window_height);
     });
     save_result.set_callback(move |_| {
         let img = image::open("./image.jpeg").expect("Should open image");
