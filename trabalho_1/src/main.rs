@@ -5,11 +5,11 @@ const COLOR_NUMBER: usize = 256;
 use fltk::{
     app,
     button::Button,
-    dialog::{self, FileChooser, FileChooserType, FileDialog},
+    dialog::{self, FileChooser, FileChooserType, FileDialog, HelpDialog},
     frame::Frame,
     image::SharedImage,
     prelude::*,
-    window::Window,
+    window::Window, input::Input,
 };
 const SAVED_FILE: &'static str = "./loaded_image.jpeg";
 
@@ -48,27 +48,33 @@ fn make_ui() {
     let mut image = SharedImage::load(SAVED_FILE).unwrap();
     image.scale(width, height, true, true);
     frame.set_image(Some(image));
-    let mut but_eequalize = Button::default()
+    let mut but_equalize = Button::default()
         .with_size((width + 100) / 5, 20)
         .below_of(&frame, 0)
-        .with_pos(width / 15, window_height + 10)
+        .with_pos(width / 15, window_height)
         .with_label("Equalize");
     let mut but_horizontal = Button::default()
-        .size_of(&but_eequalize)
-        .right_of(&but_eequalize, 5)
+        .size_of(&but_equalize)
+        .right_of(&but_equalize, 5)
         .with_label("Flip Horizontal");
     let mut but_vertical = Button::default()
-        .size_of(&but_eequalize)
+        .size_of(&but_equalize)
         .right_of(&but_horizontal, 5)
         .with_label("Flip Vertical");
     let mut but_gray = Button::default()
-        .size_of(&but_eequalize)
+        .size_of(&but_equalize)
         .right_of(&but_vertical, 5)
         .with_label("Gray Scale");
     let mut save_result = Button::default()
-        .size_of(&but_eequalize)
+        .size_of(&but_equalize)
         .right_of(&but_gray, 5)
         .with_label("Save Result");
+
+        let mut equalize_val = Input::default()
+        .size_of(&but_equalize)
+        .below_of(&but_equalize, 1);
+
+        equalize_val.set_value("0");
 
     but_horizontal.set_callback(move |_| {
         let img = image::open(SAVED_FILE)
@@ -95,9 +101,9 @@ fn make_ui() {
             .expect("Should save image");
         update_frame(img.width() as i32, img.height() as i32);
     });
-    but_eequalize.set_callback(move |_| {
+    but_equalize.set_callback(move |_| {
         let img = image::open(SAVED_FILE).expect("Should open image");
-        eequalize_image(&img, 256)
+        eequalize_image(&img, equalize_val.value().trim().parse().expect("Should have number!"))
             .save("./image.jpeg")
             .expect("Should save image");
         update_frame(img.width() as i32, img.height() as i32);
