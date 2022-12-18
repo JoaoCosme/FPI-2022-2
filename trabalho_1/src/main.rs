@@ -1,56 +1,75 @@
+use std::ops::Div;
+
 use image::{DynamicImage, GenericImageView, ImageBuffer, Pixel, Rgb};
 const COLOR_NUMBER: usize = 256;
-use fltk::{app, button::Button, frame::Frame, image::SharedImage, prelude::*, window::Window, dialog::{FileDialog, FileChooser, self, FileChooserType}};
+use fltk::{
+    app,
+    button::Button,
+    dialog::{self, FileChooser, FileChooserType, FileDialog},
+    frame::Frame,
+    image::SharedImage,
+    prelude::*,
+    window::Window,
+};
 use plotters::prelude::*;
-const SAVED_FILE : &'static str = "./loaded_image.jpeg";
+const SAVED_FILE: &'static str = "./loaded_image.jpeg";
 
 fn main() {
     make_ui();
 }
 
 fn pick_file() {
-    let mut file_chooser = FileChooser::new(".", "*.{jpeg,jpg}", FileChooserType::Single, "Select a File!");
+    let mut file_chooser = FileChooser::new(
+        ".",
+        "*.{jpeg,jpg}",
+        FileChooserType::Single,
+        "Select a File!",
+    );
     file_chooser.show();
-    while file_chooser.shown(){
+    while file_chooser.shown() {
         app::wait();
     }
-    image::open(file_chooser.value(0).expect("Should have choosen file")).expect("Should open image").save(SAVED_FILE).expect("Should save opened image");
+    image::open(file_chooser.value(0).expect("Should have choosen file"))
+        .expect("Should open image")
+        .save(SAVED_FILE)
+        .expect("Should save opened image");
 }
 
 fn make_ui() {
     pick_file();
     let img = image::open(SAVED_FILE).expect("Should open image");
     let (width, height) = img.dimensions();
-    let window_width = (width+100).max(500) as i32;
+    let window_width = (width + 100).max(500) as i32;
     let window_height = (height).max(400) as i32;
     let width = width as i32;
     let height = height as i32;
     let app = app::App::default();
-    let mut window = Window::new(0, 0, window_width, window_height+50, "Hello world!");
-    let mut frame = Frame::new(0, 0, width+100, height, "").center_of_parent();
+    let mut window = Window::new(0, 0, window_width, window_height + 50, "Hello world!");
+    let mut frame = Frame::new(0, 0, width + 100, height, "").center_of_parent();
     let mut image = SharedImage::load(SAVED_FILE).unwrap();
     image.scale(width, height, true, true);
     frame.set_image(Some(image));
-    let mut but_histogram = Button::default()
-        .with_size((width+100) / 5, 20)
+    let mut but_quantize = Button::default()
+        .with_size((width + 100) / 5, 20)
         .below_of(&frame, 0)
-        .with_label("Histogram");
+        .with_label("Quantize");
     let mut but_horizontal = Button::default()
-        .size_of(&but_histogram)
-        .right_of(&but_histogram, 5)
+        .size_of(&but_quantize)
+        .right_of(&but_quantize, 5)
         .with_label("Flip Horizontal");
     let mut but_vertical = Button::default()
-        .size_of(&but_histogram)
+        .size_of(&but_quantize)
         .right_of(&but_horizontal, 5)
         .with_label("Flip Vertical");
     let mut but_gray = Button::default()
-        .size_of(&but_histogram)
+        .size_of(&but_quantize)
         .right_of(&but_vertical, 5)
         .with_label("Gray Scale");
     let mut save_result = Button::default()
-        .size_of(&but_histogram)
+        .size_of(&but_quantize)
         .right_of(&but_gray, 5)
         .with_label("Save Result");
+
     but_horizontal.set_callback(move |_| {
         let img = image::open(SAVED_FILE)
             .expect("Should open image")
@@ -58,15 +77,15 @@ fn make_ui() {
         horizontal_flip(&img)
             .save("./image.jpeg")
             .expect("Should save image");
-            update_frame(window_width, window_height);
-        });
+        update_frame(window_width, window_height);
+    });
     but_gray.set_callback(move |_| {
         let img = image::open(SAVED_FILE).expect("Should open image");
         make_gray_image(&img)
             .save("./image.jpeg")
             .expect("Should save image");
-            update_frame(window_width, window_height);
-        });
+        update_frame(window_width, window_height);
+    });
     but_vertical.set_callback(move |_| {
         let img = image::open(SAVED_FILE)
             .expect("Should open image")
@@ -76,25 +95,21 @@ fn make_ui() {
             .expect("Should save image");
         update_frame(window_width, window_height);
     });
-    but_histogram.set_callback(move |_| {
+    but_quantize.set_callback(move |_| {
         let img = image::open(SAVED_FILE).expect("Should open image");
-        draw_histogram(
-            &make_histogram(&make_gray_image(&img)),
-            "./image.jpeg".to_string(),
-        );
+        quantize_image(&img,20).save("./image.jpeg").expect("Should save image");
         update_frame(window_width, window_height);
     });
     save_result.set_callback(move |_| {
         let img = image::open("./image.jpeg").expect("Should open image");
-        let mut save = FileDialog::new(
-          dialog::FileDialogType::BrowseSaveFile
-        );
-        
+        let mut save = FileDialog::new(dialog::FileDialogType::BrowseSaveFile);
+
         save.show();
         while Some(save.filename()).is_none() {
             app::wait();
         }
-        img.save(save.filename()).expect("Should save image correctly");
+        img.save(save.filename())
+            .expect("Should save image correctly");
     });
     window.make_resizable(false);
     window.show();
@@ -178,27 +193,80 @@ fn draw_histogram(histogram: &[usize; COLOR_NUMBER], save_path: String) {
     .unwrap();
 }
 
-fn horizontal_flip(gray_image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
-    let width = gray_image.width();
+fn horizontal_flip(image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
+    let width = image.width();
     let half = width / 2;
-    let mut output: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(width, gray_image.height());
+    let mut output: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(width, image.height());
     for x in 0..half {
-        for y in 0..gray_image.height() {
-            output.put_pixel(x, y, gray_image.get_pixel(width - x - 1 as u32, y).clone());
-            output.put_pixel(width - x - 1, y as u32, gray_image.get_pixel(x, y).clone());
+        for y in 0..image.height() {
+            output.put_pixel(x, y, image.get_pixel(width - x - 1 as u32, y).clone());
+            output.put_pixel(width - x - 1, y as u32, image.get_pixel(x, y).clone());
         }
     }
     return output;
 }
 
-fn vertical_flip(gray_image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
-    let width = gray_image.width();
-    let height = gray_image.height();
-    let mut output: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(width, gray_image.height());
+fn vertical_flip(image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
+    let width = image.width();
+    let height = image.height();
+    let mut output: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(width, image.height());
     for x in 0..width {
         for y in 0..height / 2 {
-            output.put_pixel(x, y, gray_image.get_pixel(x, height - 1 - y).clone());
-            output.put_pixel(x, height - y - 1 as u32, gray_image.get_pixel(x, y).clone());
+            output.put_pixel(x, y, image.get_pixel(x, height - 1 - y).clone());
+            output.put_pixel(x, height - y - 1 as u32, image.get_pixel(x, y).clone());
+        }
+    }
+    return output;
+}
+
+fn quantize_image(image: &DynamicImage, num_of_colors:i32) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
+    let image_gray = make_gray_image(&image);
+    let hist = make_histogram(&image_gray);
+    let image = image_gray;
+    let width = image.width();
+    let height = image.height();
+    let mut output: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(width, image.height());
+    let alpha = num_of_colors.div(image.height() as i32).div(image.width() as i32);
+    let mut hist_cum = vec![];
+    hist_cum.push(alpha * hist[0] as i32);
+    for i in 1..num_of_colors{
+        hist_cum.push(hist_cum.last().unwrap() +alpha*hist[i as usize] as i32);
+    }
+    let t1 = image.pixels().map(|pixel| {
+        pixel.0[0]
+    }).min().unwrap();
+    let t2 = image.pixels().map(|pixel| {
+        pixel.0[0]
+    }).max().unwrap();    let tb =256/num_of_colors;
+    let tam_int = t2 as i32-t1 as i32+1;
+
+    let mut should_adjust_bins = false;
+    if num_of_colors < tam_int{
+        should_adjust_bins = true;
+    }
+    let tb = tam_int / num_of_colors;
+
+
+    for x in 0..width {
+        for y in 0..height / 2 {
+            let mut value = image.get_pixel(x, y).to_rgb().0[0];
+
+            if should_adjust_bins {
+                for x in 0..num_of_colors{
+                    let bin_start = t1 as f32-0.5;
+                    let bin_end = t2 as f32 -0.5+tb as f32;
+                    if (value as f32 >= bin_start) && (value as f32 <= bin_end){
+                        value = (bin_start+(tb as f32/2.0)) as u8;
+                        break;
+                    }
+                }
+            }
+
+            let color = hist_cum[value as usize] as u8;
+            output.put_pixel(x, y, 
+                Rgb {
+                    0: [color, color, color],
+                },);
         }
     }
     return output;
