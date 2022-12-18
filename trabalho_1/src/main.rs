@@ -10,7 +10,7 @@ use fltk::{
     image::SharedImage,
     input::Input,
     prelude::*,
-    window::Window,
+    window::Window, enums::Align,
 };
 const SAVED_FILE: &'static str = "./loaded_image.jpeg";
 
@@ -39,20 +39,19 @@ fn make_ui() {
     pick_file();
     let img = image::open(SAVED_FILE).expect("Should open image");
     let (width, height) = img.dimensions();
-    let window_width = (width + 100).max(500) as i32;
-    let window_height = (height).max(400) as i32;
+    let window_width = (width + 40).max(500) as i32;
+    let window_height = (height+ 20).max(400) as i32;
     let width = width as i32;
     let height = height as i32;
     let app = app::App::default();
     let mut window = Window::new(0, 0, window_width, window_height + 50, "Base Image");
-    let mut frame = Frame::new(0, 0, width, height, "").center_of_parent();
+    let mut frame = Frame::new(20, 10, width, height, "");
     let mut image = SharedImage::load(SAVED_FILE).unwrap();
     image.scale(width, height, true, true);
     frame.set_image(Some(image));
     let mut but_equalize = Button::default()
-        .with_size((width + 100) / 5, 20)
+        .with_size((window_width-100) / 5, 20)
         .below_of(&frame, 0)
-        .with_pos(width / 15, window_height)
         .with_label("Equalize");
     let mut but_horizontal = Button::default()
         .size_of(&but_equalize)
