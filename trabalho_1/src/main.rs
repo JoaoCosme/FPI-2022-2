@@ -51,7 +51,7 @@ fn make_ui() {
     let mut but_eequalize = Button::default()
         .with_size((width + 100) / 5, 20)
         .below_of(&frame, 0)
-        .with_pos(width/15, window_height+10)
+        .with_pos(width / 15, window_height + 10)
         .with_label("Equalize");
     let mut but_horizontal = Button::default()
         .size_of(&but_eequalize)
