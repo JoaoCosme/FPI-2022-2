@@ -11,7 +11,6 @@ use fltk::{
     prelude::*,
     window::Window,
 };
-use plotters::prelude::*;
 const SAVED_FILE: &'static str = "./loaded_image.jpeg";
 
 fn main() {
@@ -175,29 +174,6 @@ fn make_histogram(gray_image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> [usize; COLOR_N
         }
     }
     return histogram;
-}
-
-fn draw_histogram(histogram: &[usize; COLOR_NUMBER], save_path: String) {
-    let max_bin_value = histogram.iter().cloned().fold(0 as usize, usize::max);
-    let root_area = BitMapBackend::new(save_path.as_str(), (600, 400)).into_drawing_area();
-    root_area.fill(&WHITE).unwrap();
-    let mut ctx = ChartBuilder::on(&root_area)
-        .set_label_area_size(LabelAreaPosition::Left, 40)
-        .set_label_area_size(LabelAreaPosition::Bottom, 40)
-        .caption("Histograma", ("sans-serif", 40))
-        .build_cartesian_2d((0..COLOR_NUMBER).into_segmented(), 0..max_bin_value)
-        .unwrap();
-
-    ctx.configure_mesh().draw().unwrap();
-
-    ctx.draw_series((0..).zip(histogram.iter()).map(|(x, y)| {
-        let x0 = SegmentValue::Exact(x);
-        let x1 = SegmentValue::Exact(x + 1);
-        let mut bar = Rectangle::new([(x0, 0), (x1, *y)], BLUE.filled());
-        bar.set_margin(0, 0, 5, 5);
-        bar
-    }))
-    .unwrap();
 }
 
 fn horizontal_flip(image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
