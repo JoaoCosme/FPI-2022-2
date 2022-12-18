@@ -44,7 +44,7 @@ fn make_ui() {
     let width = width as i32;
     let height = height as i32;
     let app = app::App::default();
-    let mut window = Window::new(0, 0, window_width, window_height + 50, "Hello world!");
+    let mut window = Window::new(0, 0, window_width, window_height + 50, "Base Image");
     let mut frame = Frame::new(0, 0, width + 100, height, "").center_of_parent();
     let mut image = SharedImage::load(SAVED_FILE).unwrap();
     image.scale(width, height, true, true);
@@ -77,14 +77,14 @@ fn make_ui() {
         horizontal_flip(&img)
             .save("./image.jpeg")
             .expect("Should save image");
-        update_frame(window_width, window_height);
+        update_frame(img.width() as i32, img.height() as i32);
     });
     but_gray.set_callback(move |_| {
         let img = image::open(SAVED_FILE).expect("Should open image");
         make_gray_image(&img)
             .save("./image.jpeg")
             .expect("Should save image");
-        update_frame(window_width, window_height);
+        update_frame(img.width() as i32, img.height() as i32);
     });
     but_vertical.set_callback(move |_| {
         let img = image::open(SAVED_FILE)
@@ -93,12 +93,14 @@ fn make_ui() {
         vertical_flip(&img)
             .save("./image.jpeg")
             .expect("Should save image");
-        update_frame(window_width, window_height);
+        update_frame(img.width() as i32, img.height() as i32);
     });
     but_quantize.set_callback(move |_| {
         let img = image::open(SAVED_FILE).expect("Should open image");
-        quantize_image(&img,20).save("./image.jpeg").expect("Should save image");
-        update_frame(window_width, window_height);
+        quantize_image(&img, 256)
+            .save("./image.jpeg")
+            .expect("Should save image");
+        update_frame(img.width() as i32, img.height() as i32);
     });
     save_result.set_callback(move |_| {
         let img = image::open("./image.jpeg").expect("Should open image");
@@ -117,11 +119,15 @@ fn make_ui() {
 }
 
 fn update_frame(width: i32, height: i32) {
-    let mut window = Window::new(width, 0, width, height + 25, "Result");
-    let mut frame = Frame::new(0, 0, width, height, "");
-    let mut image2 = SharedImage::load("./image.jpeg").unwrap();
-    image2.scale(width, height, true, true);
-    frame.set_image(Some(image2));
+    let window_width = (width + 100).max(500) as i32;
+    let window_height = (height).max(400) as i32;
+    let width = width as i32;
+    let height = height as i32;
+    let mut window = Window::new(window_width, 0, window_width, window_height + 50, "Result");
+    let mut frame = Frame::new(0, 0, width + 100, height, "").center_of_parent();
+    let mut image = SharedImage::load("./image.jpeg").unwrap();
+    image.scale(width, height, true, true);
+    frame.set_image(Some(image));
     window.show();
 }
 
@@ -219,54 +225,58 @@ fn vertical_flip(image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffer<Rgb<u8>, 
     return output;
 }
 
-fn quantize_image(image: &DynamicImage, num_of_colors:i32) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
+fn quantize_image(image: &DynamicImage, num_of_colors: i32) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
     let image_gray = make_gray_image(&image);
     let hist = make_histogram(&image_gray);
     let image = image_gray;
     let width = image.width();
     let height = image.height();
     let mut output: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(width, image.height());
-    let alpha = num_of_colors.div(image.height() as i32).div(image.width() as i32);
-    let mut hist_cum = vec![];
-    hist_cum.push(alpha * hist[0] as i32);
-    for i in 1..num_of_colors{
-        hist_cum.push(hist_cum.last().unwrap() +alpha*hist[i as usize] as i32);
-    }
-    let t1 = image.pixels().map(|pixel| {
-        pixel.0[0]
-    }).min().unwrap();
-    let t2 = image.pixels().map(|pixel| {
-        pixel.0[0]
-    }).max().unwrap();    let tb =256/num_of_colors;
-    let tam_int = t2 as i32-t1 as i32+1;
+    let alpha = 255.0.div(image.height().wrapping_mul(image.width()) as f32);
 
-    let mut should_adjust_bins = false;
-    if num_of_colors < tam_int{
-        should_adjust_bins = true;
+    let mut hist_cumulative = vec![];
+    hist_cumulative.push(alpha * hist[0] as f32);
+    for i in 1..=255 {
+        hist_cumulative.push(
+            hist_cumulative
+                .last()
+                .expect("Should have at least one value")
+                + (alpha * hist[i as usize] as f32),
+        );
     }
+    hist_cumulative = dbg!(hist_cumulative);
+    let t1 = image.pixels().map(|pixel| pixel.0[0]).min().unwrap();
+    let t2 = image.pixels().map(|pixel| pixel.0[0]).max().unwrap();
+    let tam_int = t2 as i32 - t1 as i32 + 1;
+
+    let should_adjust_bins = num_of_colors < tam_int;
     let tb = tam_int / num_of_colors;
 
-
     for x in 0..width {
-        for y in 0..height / 2 {
+        for y in 0..height {
             let mut value = image.get_pixel(x, y).to_rgb().0[0];
 
             if should_adjust_bins {
-                for x in 0..num_of_colors{
-                    let bin_start = t1 as f32-0.5;
-                    let bin_end = t2 as f32 -0.5+tb as f32;
-                    if (value as f32 >= bin_start) && (value as f32 <= bin_end){
-                        value = (bin_start+(tb as f32/2.0)) as u8;
+                for x in 0..num_of_colors {
+                    let bin_start = t1 as f32 - 0.5 + (tb * x) as f32;
+                    let bin_end = t1 as f32 - 0.5 + (tb * (x + 1)) as f32;
+                    if (value as f32 >= bin_start) && (value as f32 <= bin_end) {
+                        value = x as u8;
                         break;
+                    }
+                    if x == num_of_colors - 1 {
+                        value = x as u8 - 1;
                     }
                 }
             }
-
-            let color = hist_cum[value as usize] as u8;
-            output.put_pixel(x, y, 
+            let color = hist_cumulative[value as usize] as u8;
+            output.put_pixel(
+                x,
+                y,
                 Rgb {
                     0: [color, color, color],
-                },);
+                },
+            );
         }
     }
     return output;
