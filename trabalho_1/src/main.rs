@@ -45,28 +45,29 @@ fn make_ui() {
     let height = height as i32;
     let app = app::App::default();
     let mut window = Window::new(0, 0, window_width, window_height + 50, "Base Image");
-    let mut frame = Frame::new(0, 0, width + 100, height, "").center_of_parent();
+    let mut frame = Frame::new(0, 0, width, height, "").center_of_parent();
     let mut image = SharedImage::load(SAVED_FILE).unwrap();
     image.scale(width, height, true, true);
     frame.set_image(Some(image));
-    let mut but_quantize = Button::default()
+    let mut but_eequalize = Button::default()
         .with_size((width + 100) / 5, 20)
         .below_of(&frame, 0)
-        .with_label("Quantize");
+        .with_pos(width/15, window_height+10)
+        .with_label("Equalize");
     let mut but_horizontal = Button::default()
-        .size_of(&but_quantize)
-        .right_of(&but_quantize, 5)
+        .size_of(&but_eequalize)
+        .right_of(&but_eequalize, 5)
         .with_label("Flip Horizontal");
     let mut but_vertical = Button::default()
-        .size_of(&but_quantize)
+        .size_of(&but_eequalize)
         .right_of(&but_horizontal, 5)
         .with_label("Flip Vertical");
     let mut but_gray = Button::default()
-        .size_of(&but_quantize)
+        .size_of(&but_eequalize)
         .right_of(&but_vertical, 5)
         .with_label("Gray Scale");
     let mut save_result = Button::default()
-        .size_of(&but_quantize)
+        .size_of(&but_eequalize)
         .right_of(&but_gray, 5)
         .with_label("Save Result");
 
@@ -95,9 +96,9 @@ fn make_ui() {
             .expect("Should save image");
         update_frame(img.width() as i32, img.height() as i32);
     });
-    but_quantize.set_callback(move |_| {
+    but_eequalize.set_callback(move |_| {
         let img = image::open(SAVED_FILE).expect("Should open image");
-        quantize_image(&img, 256)
+        eequalize_image(&img, 256)
             .save("./image.jpeg")
             .expect("Should save image");
         update_frame(img.width() as i32, img.height() as i32);
@@ -225,7 +226,7 @@ fn vertical_flip(image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffer<Rgb<u8>, 
     return output;
 }
 
-fn quantize_image(image: &DynamicImage, num_of_colors: i32) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
+fn eequalize_image(image: &DynamicImage, num_of_colors: i32) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
     let image_gray = make_gray_image(&image);
     let hist = make_histogram(&image_gray);
     let image = image_gray;
