@@ -5,11 +5,12 @@ const COLOR_NUMBER: usize = 256;
 use fltk::{
     app,
     button::Button,
-    dialog::{self, FileChooser, FileChooserType, FileDialog, HelpDialog},
+    dialog::{self, FileChooser, FileChooserType, FileDialog},
     frame::Frame,
     image::SharedImage,
+    input::Input,
     prelude::*,
-    window::Window, input::Input,
+    window::Window,
 };
 const SAVED_FILE: &'static str = "./loaded_image.jpeg";
 
@@ -70,11 +71,11 @@ fn make_ui() {
         .right_of(&but_gray, 5)
         .with_label("Save Result");
 
-        let mut equalize_val = Input::default()
+    let mut equalize_val = Input::default()
         .size_of(&but_equalize)
         .below_of(&but_equalize, 1);
 
-        equalize_val.set_value("0");
+    equalize_val.set_value("0");
 
     but_horizontal.set_callback(move |_| {
         let img = image::open(SAVED_FILE)
@@ -103,9 +104,16 @@ fn make_ui() {
     });
     but_equalize.set_callback(move |_| {
         let img = image::open(SAVED_FILE).expect("Should open image");
-        eequalize_image(&img, equalize_val.value().trim().parse().expect("Should have number!"))
-            .save("./image.jpeg")
-            .expect("Should save image");
+        eequalize_image(
+            &img,
+            equalize_val
+                .value()
+                .trim()
+                .parse()
+                .expect("Should have number!"),
+        )
+        .save("./image.jpeg")
+        .expect("Should save image");
         update_frame(img.width() as i32, img.height() as i32);
     });
     save_result.set_callback(move |_| {
@@ -227,7 +235,6 @@ fn eequalize_image(image: &DynamicImage, num_of_colors: i32) -> ImageBuffer<Rgb<
                 + (alpha * hist[i as usize] as f32),
         );
     }
-    hist_cumulative = dbg!(hist_cumulative);
     let t1 = image.pixels().map(|pixel| pixel.0[0]).min().unwrap();
     let t2 = image.pixels().map(|pixel| pixel.0[0]).max().unwrap();
     let tam_int = t2 as i32 - t1 as i32 + 1;
@@ -237,22 +244,21 @@ fn eequalize_image(image: &DynamicImage, num_of_colors: i32) -> ImageBuffer<Rgb<
 
     for x in 0..width {
         for y in 0..height {
-            let mut value = image.get_pixel(x, y).to_rgb().0[0];
-
+            let value = image.get_pixel(x, y).to_rgb().0[0];
+            let mut color = hist_cumulative[value as usize] as u8;
             if should_adjust_bins {
                 for x in 0..num_of_colors {
                     let bin_start = t1 as f32 - 0.5 + (tb * x) as f32;
                     let bin_end = t1 as f32 - 0.5 + (tb * (x + 1)) as f32;
                     if (value as f32 >= bin_start) && (value as f32 <= bin_end) {
-                        value = x as u8;
+                        color = bin_start as u8;
                         break;
                     }
                     if x == num_of_colors - 1 {
-                        value = x as u8 - 1;
+                        color = bin_start as u8 - 1;
                     }
                 }
             }
-            let color = hist_cumulative[value as usize] as u8;
             output.put_pixel(
                 x,
                 y,
