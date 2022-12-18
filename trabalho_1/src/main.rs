@@ -1,6 +1,6 @@
 use image::{DynamicImage, GenericImageView, ImageBuffer, Pixel, Rgb};
 const COLOR_NUMBER: usize = 256;
-use fltk::{app, button::Button, frame::Frame, image::SharedImage, prelude::*, window::Window};
+use fltk::{app, button::Button, frame::Frame, image::SharedImage, prelude::*, window::Window, dialog::{FileDialog, FileChooser, self}};
 use plotters::prelude::*;
 
 fn main() {
@@ -19,7 +19,7 @@ fn make_ui(width: i32, height: i32) {
     image.scale(width, height, true, true);
     frame.set_image(Some(image));
     let mut but_histogram = Button::default()
-        .with_size((width - 10) / 4, 20)
+        .with_size((width - 10) / 5, 20)
         .below_of(&frame, 0)
         .with_label("Calculate Histogram");
     let mut but_horizontal = Button::default()
@@ -34,6 +34,10 @@ fn make_ui(width: i32, height: i32) {
         .size_of(&but_histogram)
         .right_of(&but_vertical, 5)
         .with_label("Gray Scale");
+    let mut save_result = Button::default()
+        .size_of(&but_histogram)
+        .right_of(&but_vertical, 5)
+        .with_label("Save Result");
     but_horizontal.set_callback(move |_| {
         let img = image::open("./src/test_images/Underwater_53k.jpg")
             .expect("Should open image")
@@ -51,7 +55,9 @@ fn make_ui(width: i32, height: i32) {
         update_frame(width, height);
     });
     but_vertical.set_callback(move |_| {
-        let img = image::open("./src/test_images/Underwater_53k.jpg").expect("Should open image").into_rgb8();
+        let img = image::open("./src/test_images/Underwater_53k.jpg")
+            .expect("Should open image")
+            .into_rgb8();
         vertical_flip(&img)
             .save("./image.jpeg")
             .expect("Should save image");
@@ -59,8 +65,23 @@ fn make_ui(width: i32, height: i32) {
     });
     but_histogram.set_callback(move |_| {
         let img = image::open("./src/test_images/Underwater_53k.jpg").expect("Should open image");
-        draw_histogram(&make_histogram(&make_gray_image(&img)),"./image.jpeg".to_string());
+        draw_histogram(
+            &make_histogram(&make_gray_image(&img)),
+            "./image.jpeg".to_string(),
+        );
         update_frame(width, height);
+    });
+    save_result.set_callback(move |_| {
+        let img = image::open("./image.jpeg").expect("Should open image");
+        let mut save = FileDialog::new(
+          dialog::FileDialogType::BrowseSaveFile
+        );
+        
+        save.show();
+        while Some(save.filename()).is_none() {
+            app::wait();
+        }
+        img.save(save.filename()).expect("Should save image correctly");
     });
     window.make_resizable(false);
     window.show();
@@ -121,7 +142,7 @@ fn make_histogram(gray_image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> [usize; COLOR_N
     return histogram;
 }
 
-fn draw_histogram(histogram: &[usize; COLOR_NUMBER],save_path:String) {
+fn draw_histogram(histogram: &[usize; COLOR_NUMBER], save_path: String) {
     let max_bin_value = histogram.iter().cloned().fold(0 as usize, usize::max);
     let root_area = BitMapBackend::new(save_path.as_str(), (600, 400)).into_drawing_area();
     root_area.fill(&WHITE).unwrap();
