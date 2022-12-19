@@ -145,16 +145,13 @@ fn update_frame(width: i32, height: i32) {
 }
 
 fn make_gray_image(img: &DynamicImage) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
-    let (width, h) = img.dimensions();
-    let mut output = ImageBuffer::new(width, h);
-    let mut gray_image: Vec<Vec<u8>> = vec![];
+    let (width, height) = img.dimensions();
+    let mut output = ImageBuffer::new(width, height);
 
     let (width, height) = img.dimensions();
     for x in 0..width {
-        let mut line = vec![];
         for y in 0..height {
             let gray_pixel = to_grayscale(&img.get_pixel(x, y).to_rgb().0);
-            line.push(gray_pixel);
             output.put_pixel(
                 x,
                 y,
@@ -163,7 +160,6 @@ fn make_gray_image(img: &DynamicImage) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
                 },
             );
         }
-        gray_image.push(line)
     }
     return output;
 }
