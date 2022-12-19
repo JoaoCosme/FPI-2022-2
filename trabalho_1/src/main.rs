@@ -10,7 +10,7 @@ use fltk::{
     image::SharedImage,
     input::Input,
     prelude::*,
-    window::Window, enums::Align,
+    window::Window,
 };
 const SAVED_FILE: &'static str = "./loaded_image.jpeg";
 
@@ -81,15 +81,15 @@ fn make_ui() {
             .expect("Should open image")
             .into_rgb8();
         horizontal_flip(&img)
-            .save("./image.jpeg")
+            .save(SAVED_FILE)
             .expect("Should save image");
         update_frame(img.width() as i32, img.height() as i32);
     });
     but_gray.set_callback(move |_| {
         let img = image::open(SAVED_FILE).expect("Should open image");
         make_gray_image(&img)
-            .save("./image.jpeg")
-            .expect("Should save image");
+        .save(SAVED_FILE)
+        .expect("Should save image");
         update_frame(img.width() as i32, img.height() as i32);
     });
     but_vertical.set_callback(move |_| {
@@ -97,13 +97,13 @@ fn make_ui() {
             .expect("Should open image")
             .into_rgb8();
         vertical_flip(&img)
-            .save("./image.jpeg")
-            .expect("Should save image");
+        .save(SAVED_FILE)
+        .expect("Should save image");
         update_frame(img.width() as i32, img.height() as i32);
     });
     but_equalize.set_callback(move |_| {
         let img = image::open(SAVED_FILE).expect("Should open image");
-        eequalize_image(
+        equalize_image(
             &img,
             equalize_val
                 .value()
@@ -111,12 +111,12 @@ fn make_ui() {
                 .parse()
                 .expect("Should have number!"),
         )
-        .save("./image.jpeg")
+        .save(SAVED_FILE)
         .expect("Should save image");
         update_frame(img.width() as i32, img.height() as i32);
     });
     save_result.set_callback(move |_| {
-        let img = image::open("./image.jpeg").expect("Should open image");
+        let img = image::open(SAVED_FILE).expect("Should open image");
         let mut save = FileDialog::new(dialog::FileDialogType::BrowseSaveFile);
 
         save.show();
@@ -138,7 +138,7 @@ fn update_frame(width: i32, height: i32) {
     let height = height as i32;
     let mut window = Window::new(window_width, 0, window_width, window_height + 50, "Result");
     let mut frame = Frame::new(0, 0, width + 100, height, "").center_of_parent();
-    let mut image = SharedImage::load("./image.jpeg").unwrap();
+    let mut image = SharedImage::load(SAVED_FILE).unwrap();
     image.scale(width, height, true, true);
     frame.set_image(Some(image));
     window.show();
@@ -215,7 +215,7 @@ fn vertical_flip(image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffer<Rgb<u8>, 
     return output;
 }
 
-fn eequalize_image(image: &DynamicImage, num_of_colors: i32) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
+fn equalize_image(image: &DynamicImage, num_of_colors: i32) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
     let image_gray = make_gray_image(&image);
     let hist = make_histogram(&image_gray);
     let image = image_gray;
