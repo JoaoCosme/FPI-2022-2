@@ -107,6 +107,8 @@ Já adicionando o filtro $Ln$, temos o seguinte resultado:
 
 <div style="page-break-after: always;"></div>
 
+Neste ultimo, podemos ver mais detalhes aos elementos que estão no fundo da imagem, com suas bordas mais destacadas se compadas ao filtro $Lp$
+
 ### 4.3 Filtro HighBoost
 
 Utilizando este filtro, junto da soma de 127 ao final do processamento, temos um efeito de superposição das arestas sobre a imagem base. Dessa forma, se assemelha a desenhos, onde as arestas são feitas em traçados bem definidos.
