@@ -14,7 +14,7 @@ Conforme visto em aula, mostra a imagem carregada:
 
 ## 2 Cálculo de Negativo
 
-O MatLab / Octane, permite a aplicação de uma mesma operação sobre todos os pontos de uma imagem, dessa forma, o trecho abaixo exibe todo o processo necessário para o cálculo de negativo e apresentação do resultado:
+O MatLab / Octane (equivalente que pode ser utilizado em Linux), permite a aplicação de uma mesma operação sobre todos os pontos de uma imagem, dessa forma, o trecho abaixo exibe todo o processo necessário para o cálculo de negativo e apresentação do resultado:
 
 ```matlab
 >> figure;
