@@ -10,6 +10,8 @@ Conforme visto em aula, mostra a imagem carregada:
 
 ![load_image](2022-12-19-11-53-47.png)
 
+<div style="page-break-after: always;"></div>
+
 ## 2 Cálculo de Negativo
 
 O MatLab / Octane, permite a aplicação de uma mesma operação sobre todos os pontos de uma imagem, dessa forma, o trecho abaixo exibe todo o processo necessário para o cálculo de negativo e apresentação do resultado:
@@ -21,6 +23,7 @@ O MatLab / Octane, permite a aplicação de uma mesma operação sobre todos os 
 >> subplot(1,2,2);
 >> imshow(255-i);
 ```
+
 ![](2022-12-19-22-39-20.png)
 
 ## 3 Negativo para nova imagem
@@ -28,6 +31,8 @@ O MatLab / Octane, permite a aplicação de uma mesma operação sobre todos os 
 Segue o resultado da operação de negativo sobre a nova imagem carregada:
 
 ![](2022-12-19-22-41-38.png)
+
+<div style="page-break-after: always;"></div>
 
 ## 4 Convoluções
 
@@ -54,6 +59,7 @@ imshow(image);
 subplot(2,1,2);
 imshow(uint8(i_fg));
 ```
+
 Acima, podemos ver o trecho de código para a aplicação desta convolução utilizando o MatLab. Como executamos uma operação de ponto flutuante (visto que os valores do filtro são deste tipo), ao final, temos que reconverter a imagem para *unassigned int 8* para que possamos apresentar a imagem.
 
 ![](2022-12-19-22-49-52.png)
@@ -61,6 +67,8 @@ Acima, podemos ver o trecho de código para a aplicação desta convolução uti
 Aplicando o filtro três vezes seguidas, obtemos um resultado ainda mais borrado. Além disso, devido a aplicação sucessiva de convoluções, que não são aplicadas nas bordas devido ao "encaixe" do filtro sobre essas areas, vemos uma borda surgindo.
 
 ![](2022-12-19-22-52-19.png)
+
+<div style="page-break-after: always;"></div>
 
 ### 4.2 Filtro LaPlaciano
 
@@ -97,6 +105,7 @@ Já adicionando o filtro $Ln$, temos o seguinte resultado:
 
 ![](2022-12-19-22-54-36.png)
 
+<div style="page-break-after: always;"></div>
 
 ### 4.3 Filtro HighBoost
 
@@ -104,6 +113,7 @@ Utilizando este filtro, junto da soma de 127 ao final do processamento, temos um
 
 ![](2022-12-19-22-56-40.png)
 
+<div style="page-break-after: always;"></div>
 
 ### 4.4 Prewitt Horizontal
 
@@ -111,11 +121,13 @@ Utilizando este filtro, criamos um efeito de contraste acentuado na extremidade 
 
 ![](2022-12-19-22-58-32.png)
 
-Somando 127, temos um efeito de 
+Somando 127, temos um efeito de
 
 ![](2022-12-19-22-59-45.png)
 
 Já invertendo os sinais de $Ph$, temos um efeito de contrastes na extremidade contrária da imagem.
+
+<div style="page-break-after: always;"></div>
 
 Já somando 127, temos o seguinte efeito
 
@@ -130,6 +142,8 @@ Este filtro gera um efeito visual de relevo nas imagens, só que dessa vez um re
 Invertendo, obtemos:
 
 ![](2022-12-19-23-02-17.png)
+
+<div style="page-break-after: always;"></div>
 
 ## 5 Computação de Gradiente
 
