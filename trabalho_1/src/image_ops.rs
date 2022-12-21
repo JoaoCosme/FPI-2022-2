@@ -4,19 +4,17 @@ use image::Rgb;
 
 use image::ImageBuffer;
 
-use image::DynamicImage;
-
-use image::{GenericImageView, Pixel};
+use image::Pixel;
 use std::ops::Div;
 
-pub(crate) fn make_gray_image(img: &DynamicImage) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
-    let (width, height) = img.dimensions();
+pub(crate) fn make_gray_image(image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
+    let (width, height) = image.dimensions();
     let mut output = ImageBuffer::new(width, height);
 
-    let (width, height) = img.dimensions();
+    let (width, height) = image.dimensions();
     for x in 0..width {
         for y in 0..height {
-            let gray_pixel = to_grayscale(&img.get_pixel(x, y).to_rgb().0);
+            let gray_pixel = to_grayscale(&image.get_pixel(x, y).0);
             output.put_pixel(
                 x,
                 y,
@@ -76,7 +74,7 @@ pub(crate) fn vertical_flip(image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffe
     return output;
 }
 
-pub(crate) fn equalize_image(image: &DynamicImage, num_of_colors: i32) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
+pub(crate) fn equalize_image(image: &ImageBuffer<Rgb<u8>, Vec<u8>>, num_of_colors: i32) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
     let image_gray = make_gray_image(&image);
     let hist = make_histogram(&image_gray);
     let image = image_gray;

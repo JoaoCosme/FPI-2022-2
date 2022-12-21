@@ -1,8 +1,5 @@
-use std::ops::Div;
 mod image_ops;
-
-
-use image::{GenericImageView, Pixel};
+use image::{GenericImageView};
 const COLOR_NUMBER: usize = 256;
 use fltk::{
     app,
@@ -88,7 +85,7 @@ fn make_ui() {
         update_frame(img.width() as i32, img.height() as i32);
     });
     but_gray.set_callback(move |_| {
-        let img = image::open(SAVED_FILE).expect("Should open image");
+        let img = image::open(SAVED_FILE).expect("Should open image").into_rgb8();
         image_ops::make_gray_image(&img)
         .save(SAVED_FILE)
         .expect("Should save image");
@@ -104,7 +101,7 @@ fn make_ui() {
         update_frame(img.width() as i32, img.height() as i32);
     });
     but_equalize.set_callback(move |_| {
-        let img = image::open(SAVED_FILE).expect("Should open image");
+        let img = image::open(SAVED_FILE).expect("Should open image").into_rgb8();
         image_ops::equalize_image(
             &img,
             equalize_val
