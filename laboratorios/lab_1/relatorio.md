@@ -14,7 +14,7 @@ Conforme visto em aula, mostra a imagem carregada:
 
 ## 2 Cálculo de Negativo
 
-O MatLab / Octane (equivalente que pode ser utilizado em Linux), permite a aplicação de uma mesma operação sobre todos os pontos de uma imagem, dessa forma, o trecho abaixo exibe todo o processo necessário para o cálculo de negativo e apresentação do resultado:
+O MatLab / Octave (equivalente Open Source que utilizei), permite a aplicação de uma mesma operação sobre todos os pontos de uma imagem, dessa forma, o trecho abaixo exibe todo o processo necessário para o cálculo de negativo e apresentação do resultado:
 
 ```matlab
 >> figure;
@@ -101,17 +101,21 @@ Aplicando o filtro $Lp$, temos o seguinte resultado:
 
 ![](2022-12-19-22-55-03.png)
 
+<div style="page-break-after: always;"></div>
+
 Já adicionando o filtro $Ln$, temos o seguinte resultado:
 
 ![](2022-12-19-22-54-36.png)
 
-<div style="page-break-after: always;"></div>
 
 Neste ultimo, podemos ver mais detalhes aos elementos que estão no fundo da imagem, com suas bordas mais destacadas se compadas ao filtro $Lp$
 
+<div style="page-break-after: always;"></div>
+
+
 ### 4.3 Filtro HighBoost
 
-Utilizando este filtro, junto da soma de 127 ao final do processamento, temos um efeito de superposição das arestas sobre a imagem base. Dessa forma, se assemelha a desenhos, onde as arestas são feitas em traçados bem definidos.
+Utilizando este filtro, junto da soma de 127 ao final do processamento, temos um efeito de superposição das arestas sobre a imagem base. Dessa forma, se assemelha a desenhos, onde temos todos os detalhes em alto contraste.
 
 ![](2022-12-19-22-56-40.png)
 
@@ -119,21 +123,24 @@ Utilizando este filtro, junto da soma de 127 ao final do processamento, temos um
 
 ### 4.4 Prewitt Horizontal
 
-Utilizando este filtro, criamos um efeito de contraste acentuado na extremidade esquerda dos artefatos, gerando um efeito de "relevo".
+Utilizando este filtro, criamos um efeito sobre as bordas esquerda dos artefatos da imagem de maneira mais acentuado.
 
 ![](2022-12-19-22-58-32.png)
 
-Somando 127, temos um efeito de
+Somando 127, temos um efeito de achatação da imagem, onde perde-se a dimensão de profundidade.
 
 ![](2022-12-19-22-59-45.png)
 
-Já invertendo os sinais de $Ph$, temos um efeito de contrastes na extremidade contrária da imagem.
+Já invertendo os sinais de $Ph$, temos um efeito de contrastes na extremidade direita da imagem.
 
 <div style="page-break-after: always;"></div>
 
-Já somando 127, temos o seguinte efeito
+Já somando 127, temos o seguinte efeito:
 
-![](2022-12-19-23-00-24.png)
+![](2022-12-21-08-17-48.png)
+
+<div style="page-break-after: always;"></div>
+
 
 ### 4.5 Prewitt Vertical
 
@@ -183,6 +190,8 @@ function grad = mag_grad(image_name)
 Obtendo o seguinte resultado:
 
 ![](2022-12-19-23-46-26.png)
+
+<div style="page-break-after: always;"></div>
 
 ### 6 Computação de Gradiente com Comando .*
 
