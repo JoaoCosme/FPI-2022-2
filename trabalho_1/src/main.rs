@@ -1,5 +1,5 @@
 mod image_ops;
-use image::{GenericImageView};
+use image::GenericImageView;
 const COLOR_NUMBER: usize = 256;
 use fltk::{
     app,
@@ -39,7 +39,7 @@ fn make_ui() {
     let img = image::open(SAVED_FILE).expect("Should open image");
     let (width, height) = img.dimensions();
     let window_width = (width + 40).max(500) as i32;
-    let window_height = (height+ 20).max(400) as i32;
+    let window_height = (height + 20).max(400) as i32;
     let width = width as i32;
     let height = height as i32;
     let app = app::App::default();
@@ -49,7 +49,7 @@ fn make_ui() {
     image.scale(width, height, true, true);
     frame.set_image(Some(image));
     let mut but_equalize = Button::default()
-        .with_size((window_width-100) / 5, 20)
+        .with_size((window_width - 100) / 5, 20)
         .below_of(&frame, 0)
         .with_label("Equalize");
     let mut but_horizontal = Button::default()
@@ -68,10 +68,21 @@ fn make_ui() {
         .size_of(&but_equalize)
         .right_of(&but_gray, 5)
         .with_label("Save Result");
-
     let mut equalize_val = Input::default()
         .size_of(&but_equalize)
         .below_of(&but_equalize, 1);
+    let mut but_bright = Button::default()
+        .with_size((window_width - 100) / 5, 20)
+        .below_of(&but_horizontal, 0)
+        .with_label("Bright Up");
+    let mut but_contrast = Button::default()
+        .with_size((window_width - 100) / 5, 20)
+        .right_of(&but_bright, 5)
+        .with_label("Contrast Up");
+    let mut but_negative = Button::default()
+        .with_size((window_width - 100) / 5, 20)
+        .right_of(&but_contrast, 5)
+        .with_label("Negative");
 
     equalize_val.set_value("0");
 
@@ -85,10 +96,12 @@ fn make_ui() {
         update_frame(img.width() as i32, img.height() as i32);
     });
     but_gray.set_callback(move |_| {
-        let img = image::open(SAVED_FILE).expect("Should open image").into_rgb8();
+        let img = image::open(SAVED_FILE)
+            .expect("Should open image")
+            .into_rgb8();
         image_ops::make_gray_image(&img)
-        .save(SAVED_FILE)
-        .expect("Should save image");
+            .save(SAVED_FILE)
+            .expect("Should save image");
         update_frame(img.width() as i32, img.height() as i32);
     });
     but_vertical.set_callback(move |_| {
@@ -96,12 +109,14 @@ fn make_ui() {
             .expect("Should open image")
             .into_rgb8();
         image_ops::vertical_flip(&img)
-        .save(SAVED_FILE)
-        .expect("Should save image");
+            .save(SAVED_FILE)
+            .expect("Should save image");
         update_frame(img.width() as i32, img.height() as i32);
     });
     but_equalize.set_callback(move |_| {
-        let img = image::open(SAVED_FILE).expect("Should open image").into_rgb8();
+        let img = image::open(SAVED_FILE)
+            .expect("Should open image")
+            .into_rgb8();
         image_ops::equalize_image(
             &img,
             equalize_val
@@ -142,4 +157,3 @@ fn update_frame(width: i32, height: i32) {
     frame.set_image(Some(image));
     window.show();
 }
-
