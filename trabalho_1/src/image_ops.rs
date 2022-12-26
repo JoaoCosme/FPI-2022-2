@@ -1,8 +1,8 @@
 use super::COLOR_NUMBER;
 
-use fltk::image::Image;
-use image::GenericImageView;
 use image::Rgb;
+use plotters::prelude::*;
+
 
 use image::ImageBuffer;
 
@@ -142,4 +142,27 @@ pub fn apply_point_operation(image:&ImageBuffer<Rgb<u8>,Vec<u8>>, a: f32, b:f32)
         }
     }
     return output;   
+}
+
+
+pub fn draw_histogram(histogram:&[usize;256], path:&'static str){
+    let maxY = histogram.iter().cloned().fold(0 as usize, usize::max);
+    let root_area = BitMapBackend::new(path,(600,400)).into_drawing_area();
+    root_area.fill(&WHITE).unwrap();
+    let mut ctx = ChartBuilder::on(&root_area)
+    .set_label_area_size(LabelAreaPosition::Left, 40)
+    .set_label_area_size(LabelAreaPosition::Bottom, 40)
+    .caption("Histograma",("sans-serif",40))
+    .build_cartesian_2d((0..256).into_segmented(), 0..maxY)
+    .unwrap();
+  
+    ctx.configure_mesh().draw().unwrap();
+  
+    ctx.draw_series((0..).zip(histogram.iter()).map(|(x,y)|{
+      let x0 = SegmentValue::Exact(x);
+      let x1 = SegmentValue::Exact(x+1);
+      let mut bar = Rectangle::new([(x0,0),(x1,*y)],BLUE.filled());
+      bar.set_margin(0, 0, 5, 5);
+      bar
+    })).unwrap();
 }

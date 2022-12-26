@@ -11,7 +11,10 @@ use fltk::{
     prelude::*,
     window::Window,
 };
+
+
 const SAVED_FILE: &'static str = "./loaded_image.jpeg";
+const HISTOGRAM: &'static str = "./histogram.jpeg";
 
 fn main() {
     make_ui();
@@ -83,6 +86,10 @@ fn make_ui() {
         .with_size((window_width - 100) / 5, 20)
         .right_of(&but_contrast, 5)
         .with_label("Negative");
+    let mut but_histogram = Button::default()
+        .with_size((window_width - 100) / 5, 20)
+        .right_of(&but_negative, 5)
+        .with_label("Histogram");
 
     equalize_val.set_value("0");
 
@@ -93,8 +100,8 @@ fn make_ui() {
         image_ops::horizontal_flip(&img)
             .save(SAVED_FILE)
             .expect("Should save image");
-        update_frame(img.width() as i32, img.height() as i32);
-    });
+            update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
+        });
     but_gray.set_callback(move |_| {
         let img = image::open(SAVED_FILE)
             .expect("Should open image")
@@ -102,8 +109,8 @@ fn make_ui() {
         image_ops::make_gray_image(&img)
             .save(SAVED_FILE)
             .expect("Should save image");
-        update_frame(img.width() as i32, img.height() as i32);
-    });
+            update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
+        });
     but_vertical.set_callback(move |_| {
         let img = image::open(SAVED_FILE)
             .expect("Should open image")
@@ -111,8 +118,8 @@ fn make_ui() {
         image_ops::vertical_flip(&img)
             .save(SAVED_FILE)
             .expect("Should save image");
-        update_frame(img.width() as i32, img.height() as i32);
-    });
+            update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
+        });
     but_equalize.set_callback(move |_| {
         let img = image::open(SAVED_FILE)
             .expect("Should open image")
@@ -127,7 +134,7 @@ fn make_ui() {
         )
         .save(SAVED_FILE)
         .expect("Should save image");
-        update_frame(img.width() as i32, img.height() as i32);
+        update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
     });
     save_result.set_callback(move |_| {
         let img = image::open(SAVED_FILE).expect("Should open image");
@@ -147,7 +154,7 @@ fn make_ui() {
         image_ops::apply_point_operation(&img,1.0,10.0)
         .save(SAVED_FILE)
         .expect("Should save image");
-    update_frame(img.width() as i32, img.height() as i32);
+    update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
     });
     but_contrast.set_callback(move |_| {
         let img = image::open(SAVED_FILE)
@@ -156,7 +163,7 @@ fn make_ui() {
         image_ops::apply_point_operation(&img,0.25,0.0)
         .save(SAVED_FILE)
         .expect("Should save image");
-    update_frame(img.width() as i32, img.height() as i32);
+    update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
     });
 
     but_negative.set_callback(move |_| {
@@ -166,29 +173,34 @@ fn make_ui() {
         image_ops::apply_point_operation(&img,-1.0,255.0)
         .save(SAVED_FILE)
         .expect("Should save image");
-    update_frame(img.width() as i32, img.height() as i32);
+    update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
     });
-
-
-
+    but_histogram.set_callback(move |_| {
+        let img = image::open(SAVED_FILE)
+        .expect("Should open image")
+        .into_rgb8();
+        image_ops::draw_histogram(
+        &image_ops::make_histogram(
+            &image_ops::make_gray_image(&img)
+        ),HISTOGRAM);
+    update_frame(img.width() as i32, img.height() as i32,HISTOGRAM);
+    });
 
     window.make_resizable(false);
     window.show();
-
-
-
     app.run().ok();
 }
 
-fn update_frame(width: i32, height: i32) {
+fn update_frame(width: i32, height: i32,file_path:&'static str) {
     let window_width = (width + 100).max(500) as i32;
     let window_height = (height).max(400) as i32;
     let width = width as i32;
     let height = height as i32;
     let mut window = Window::new(window_width, 0, window_width, window_height + 50, "Result");
     let mut frame = Frame::new(0, 0, width + 100, height, "").center_of_parent();
-    let mut image = SharedImage::load(SAVED_FILE).unwrap();
+    let mut image = SharedImage::load(file_path).unwrap();
     image.scale(width, height, true, true);
     frame.set_image(Some(image));
     window.show();
 }
+
