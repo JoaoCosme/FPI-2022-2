@@ -90,6 +90,10 @@ fn make_ui() {
         .with_size((window_width - 100) / 5, 20)
         .right_of(&but_negative, 5)
         .with_label("Histogram");
+        let mut but_laplacian = Button::default()
+        .with_size((window_width - 100) / 5, 20)
+        .right_of(&but_histogram, 5)
+        .with_label("LaPlacian");
 
     equalize_val.set_value("0");
 
@@ -185,6 +189,15 @@ fn make_ui() {
         ),HISTOGRAM);
     update_frame(img.width() as i32, img.height() as i32,HISTOGRAM);
     });
+    but_laplacian.set_callback(move |_| {
+        let img = image::open(SAVED_FILE)
+            .expect("Should open image")
+            .into_rgb8();
+        image_ops::apply_conv([[0.0,-1.0,0.0],[-1.0,4.0,-1.0],[0.0,-1.0,0.0]],&img)
+            .save(SAVED_FILE)
+            .expect("Should save image");
+            update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
+        });
 
     window.make_resizable(false);
     window.show();
