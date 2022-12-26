@@ -140,8 +140,43 @@ fn make_ui() {
         img.save(save.filename())
             .expect("Should save image correctly");
     });
+    but_bright.set_callback(move |_| {
+        let img = image::open(SAVED_FILE)
+        .expect("Should open image")
+        .into_rgb8();
+        image_ops::apply_point_operation(&img,1.0,10.0)
+        .save(SAVED_FILE)
+        .expect("Should save image");
+    update_frame(img.width() as i32, img.height() as i32);
+    });
+    but_contrast.set_callback(move |_| {
+        let img = image::open(SAVED_FILE)
+        .expect("Should open image")
+        .into_rgb8();
+        image_ops::apply_point_operation(&img,0.25,0.0)
+        .save(SAVED_FILE)
+        .expect("Should save image");
+    update_frame(img.width() as i32, img.height() as i32);
+    });
+
+    but_negative.set_callback(move |_| {
+        let img = image::open(SAVED_FILE)
+        .expect("Should open image")
+        .into_rgb8();
+        image_ops::apply_point_operation(&img,-1.0,255.0)
+        .save(SAVED_FILE)
+        .expect("Should save image");
+    update_frame(img.width() as i32, img.height() as i32);
+    });
+
+
+
+
     window.make_resizable(false);
     window.show();
+
+
+
     app.run().ok();
 }
 
