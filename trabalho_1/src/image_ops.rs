@@ -194,4 +194,5 @@ pub fn apply_conv(kernel:[[f32;3];3],image:&ImageBuffer<Rgb<u8>,Vec<u8>>) -> Ima
         }
     }
     return output;   
+
 }

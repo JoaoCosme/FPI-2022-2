@@ -1,4 +1,6 @@
 mod image_ops;
+mod matrix_ops;
+mod test;
 use image::GenericImageView;
 const COLOR_NUMBER: usize = 256;
 use fltk::{
