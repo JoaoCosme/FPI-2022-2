@@ -172,21 +172,25 @@ pub fn apply_conv(kernel:[[f32;3];3],image:&ImageBuffer<Rgb<u8>,Vec<u8>>) -> Ima
     let width = image.width();
     let height = image.height();
     let mut output: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(width, image.height());
-    for x in 2..width-2 {
-        for y in 2..height-2{
+    for x in 1..width-2 {
+        for y in 1..height-2{
             let mut result = [0,0,0];
+            let mut a = 0;
             for i in 0..=2{
                 for j in 0..=2{
-                    let dislocx = i as i32-1;
-                    let dislocy = j as i32-1;
-                    let pixel = image.get_pixel((x as i32 +dislocx) as u32, (y as i32+dislocy) as u32);
-                    result[0] = result[0] + ((pixel[0] as f32 * (kernel[i as usize][j as usize]))) as u8 ;
-                    result[1] = result[1] + (pixel[1] as f32 * kernel[i as usize][j as usize]) as u8 ;
-                    result[2] = result[2] + (pixel[2] as f32 * kernel[i as usize][j as usize]) as u8 ;
-                    let result = (result);
+                    let disloc_x = i as i32-1;
+                    let disloc_y = j as i32-1;
+                    a += 1;
+
+                    let pixel = image.get_pixel((x as i32 +disloc_x) as u32, (y as i32+disloc_y) as u32);
+                    
+                    result[0] = result[0] + (pixel[0] as f32 * kernel[i as usize][j as usize]).max(0.0) as u8 ;
+                    result[1] = result[1] + (pixel[1] as f32 * kernel[i as usize][j as usize]).max(0.0) as u8 ;
+                    result[2] = result[2] + (pixel[2] as f32 * kernel[i as usize][j as usize]).max(0.0) as u8 ;
                 }
             }
-            output.put_pixel(x, y, (Rgb(result)));        
+            dbg!(a);
+            output.put_pixel(x, y, Rgb((result)));        
         }
     }
     return output;   

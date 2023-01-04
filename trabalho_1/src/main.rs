@@ -189,11 +189,13 @@ fn make_ui() {
         ),HISTOGRAM);
     update_frame(img.width() as i32, img.height() as i32,HISTOGRAM);
     });
+    let gauss = [[0.0625,0.125,0.0625],[0.125 ,0.25 ,0.125], [0.0625,0.125 ,0.0625]];
+    let laplacian = [[0.0,-1.0,0.0],[-1.0,4.0,-1.0],[0.0,-1.0,0.0]];
     but_laplacian.set_callback(move |_| {
         let img = image::open(SAVED_FILE)
             .expect("Should open image")
             .into_rgb8();
-        image_ops::apply_conv([[0.0,-1.0,0.0],[-1.0,4.0,-1.0],[0.0,-1.0,0.0]],&img)
+        image_ops::apply_conv(laplacian,&img)
             .save(SAVED_FILE)
             .expect("Should save image");
             update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
