@@ -180,19 +180,18 @@ pub fn apply_conv(kernel:[[f32;3];3],image:&ImageBuffer<Rgb<u8>,Vec<u8>>) -> Ima
                 for j in 0..=2{
                     let disloc_x = i as i32-1;
                     let disloc_y = j as i32-1;
-                    a += 1;
 
-                    let pixel = image.get_pixel((x as i32 +disloc_x) as u32, (y as i32+disloc_y) as u32);
+                    a+=1;
+
+                    let pixel = image.get_pixel((x as i32 + disloc_x) as u32, (y as i32 + disloc_y) as u32);
                     
-                    result[0] = result[0] + (pixel[0] as f32 * kernel[i as usize][j as usize]).max(0.0) as u8 ;
-                    result[1] = result[1] + (pixel[1] as f32 * kernel[i as usize][j as usize]).max(0.0) as u8 ;
-                    result[2] = result[2] + (pixel[2] as f32 * kernel[i as usize][j as usize]).max(0.0) as u8 ;
+                    result[0] = result[0] + (pixel[0] as f32 * kernel[i as usize][j as usize]) as u8 ;
+                    result[1] = result[1] + (pixel[1] as f32 * kernel[i as usize][j as usize]) as u8 ;
+                    result[2] = result[2] + (pixel[2] as f32 * kernel[i as usize][j as usize]) as u8 ;
                 }
             }
-            dbg!(a);
-            output.put_pixel(x, y, Rgb((result)));        
-        }
+            output.put_pixel(x, y, Rgb(result));     
+          }
     }
     return output;   
-
 }
