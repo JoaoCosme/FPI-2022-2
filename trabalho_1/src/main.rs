@@ -184,26 +184,14 @@ fn make_ui() {
     kernel_8.set_value("0");
 
     but_horizontal.set_callback(move |_| {
-        let img = image::open(SAVED_FILE)
-            .expect("Should open image")
-            .into_rgb8();
-        image_ops::point_ops::horizontal_flip(&img)
-            .save(SAVED_FILE)
-            .expect("Should save image");
-        update_frame(img.width(), img.height(), SAVED_FILE);
+        apply_function_to_image(&image_ops::point_ops::horizontal_flip);
     });
     but_gray.set_callback(move |_| {
         let img = turn_image_to_grayscale();
         update_frame(img.width(), img.height(), SAVED_FILE);
     });
     but_vertical.set_callback(move |_| {
-        let img = image::open(SAVED_FILE)
-            .expect("Should open image")
-            .into_rgb8();
-        image_ops::point_ops::vertical_flip(&img)
-            .save(SAVED_FILE)
-            .expect("Should save image");
-        update_frame(img.width(), img.height(), SAVED_FILE);
+        apply_function_to_image(&image_ops::point_ops::vertical_flip);
     });
     but_equalize.set_callback(move |_| {
         let img = image::open(SAVED_FILE)
@@ -319,11 +307,11 @@ fn make_ui() {
     });
 
     but_rotate_left.set_callback(move |_| {
-        rotate(&image_ops::point_ops::rotate_90_degrees_left);
+        apply_function_to_image(&image_ops::point_ops::rotate_90_degrees_left);
     });
 
     but_rotate_right.set_callback(move |_| {
-        rotate(&image_ops::point_ops::rotate_90_degrees_right);
+        apply_function_to_image(&image_ops::point_ops::rotate_90_degrees_right);
     });
 
     window.make_resizable(false);
@@ -331,7 +319,7 @@ fn make_ui() {
     app.run().ok();
 }
 
-fn rotate(
+fn apply_function_to_image(
     func: &dyn Fn(
         &image::ImageBuffer<image::Rgb<u8>, Vec<u8>>,
     ) -> image::ImageBuffer<image::Rgb<u8>, Vec<u8>>,

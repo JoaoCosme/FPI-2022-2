@@ -5,7 +5,9 @@ use image::Rgb;
 
 use image::ImageBuffer;
 
-pub(crate) fn make_gray_image(image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
+pub(crate) fn make_gray_image(
+    image: &ImageBuffer<Rgb<u8>, Vec<u8>>,
+) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
     let (width, height) = image.dimensions();
     let mut output = ImageBuffer::new(width, height);
 
@@ -46,7 +48,9 @@ pub(crate) fn make_histogram(gray_image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> [usi
     return histogram;
 }
 
-pub(crate) fn horizontal_flip(image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
+pub(crate) fn horizontal_flip(
+    image: &ImageBuffer<Rgb<u8>, Vec<u8>>,
+) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
     let width = image.width();
     let half = width / 2;
     let mut output: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(width, image.height());
@@ -59,7 +63,9 @@ pub(crate) fn horizontal_flip(image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuf
     return output;
 }
 
-pub(crate) fn vertical_flip(image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
+pub(crate) fn vertical_flip(
+    image: &ImageBuffer<Rgb<u8>, Vec<u8>>,
+) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
     let width = image.width();
     let height = image.height();
     let mut output: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(width, image.height());
@@ -72,26 +78,29 @@ pub(crate) fn vertical_flip(image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffe
     return output;
 }
 
-
-pub(crate) fn rotate_90_degrees_left(image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
+pub(crate) fn rotate_90_degrees_left(
+    image: &ImageBuffer<Rgb<u8>, Vec<u8>>,
+) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
     let width = image.width();
     let mut output: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(width, image.height());
     let height = image.height();
     for x in 0..width {
         for y in 0..height {
-            output.put_pixel(y, height-x-1, image.get_pixel(x, y).clone());
+            output.put_pixel(y, height - x - 1, image.get_pixel(x, y).clone());
         }
     }
     return output;
 }
 
-pub(crate) fn rotate_90_degrees_right(image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
+pub(crate) fn rotate_90_degrees_right(
+    image: &ImageBuffer<Rgb<u8>, Vec<u8>>,
+) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
     let width = image.width();
     let mut output: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(width, image.height());
     let height = image.height();
     for x in 0..width {
         for y in 0..height {
-            output.put_pixel(width-y-1,x, image.get_pixel(x, y).clone());
+            output.put_pixel(width - y - 1, x, image.get_pixel(x, y).clone());
         }
     }
     return output;
