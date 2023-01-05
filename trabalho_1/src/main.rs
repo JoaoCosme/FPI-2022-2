@@ -48,8 +48,8 @@ fn make_ui() {
     pick_file();
     let img = image::open(SAVED_FILE).expect("Should open image");
     let (width, height) = img.dimensions();
-    let window_width = (width + 100).max(700) as i32;
-    let window_height = (height + 150).max(400) as i32;
+    let window_width = calc_window_width(width);
+    let window_height = calc_window_height(height);
     let width = width as i32;
     let height = height as i32;
     let app = app::App::default();
@@ -181,11 +181,11 @@ fn make_ui() {
         image_ops::horizontal_flip(&img)
             .save(SAVED_FILE)
             .expect("Should save image");
-        update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
+        update_frame(img.width(), img.height(), SAVED_FILE);
     });
     but_gray.set_callback(move |_| {
         let img = turn_image_to_grayscale();
-        update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
+        update_frame(img.width(), img.height(), SAVED_FILE);
     });
     but_vertical.set_callback(move |_| {
         let img = image::open(SAVED_FILE)
@@ -194,7 +194,7 @@ fn make_ui() {
         image_ops::vertical_flip(&img)
             .save(SAVED_FILE)
             .expect("Should save image");
-        update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
+        update_frame(img.width(), img.height(), SAVED_FILE);
     });
     but_equalize.set_callback(move |_| {
         let img = image::open(SAVED_FILE)
@@ -204,7 +204,7 @@ fn make_ui() {
         image_ops::equalize_image(&img, num_of_colors)
             .save(SAVED_FILE)
             .expect("Should save image");
-        update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
+        update_frame(img.width(), img.height(), SAVED_FILE);
     });
     save_result.set_callback(move |_| {
         let img = image::open(SAVED_FILE).expect("Should open image");
@@ -224,7 +224,7 @@ fn make_ui() {
         image_ops::apply_point_operation(&img, 1.0, 10.0)
             .save(SAVED_FILE)
             .expect("Should save image");
-        update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
+        update_frame(img.width(), img.height(), SAVED_FILE);
     });
     but_contrast.set_callback(move |_| {
         let img = image::open(SAVED_FILE)
@@ -233,7 +233,7 @@ fn make_ui() {
         image_ops::apply_point_operation(&img, 0.25, 0.0)
             .save(SAVED_FILE)
             .expect("Should save image");
-        update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
+        update_frame(img.width(), img.height(), SAVED_FILE);
     });
 
     but_negative.set_callback(move |_| {
@@ -243,7 +243,7 @@ fn make_ui() {
         image_ops::apply_point_operation(&img, -1.0, 255.0)
             .save(SAVED_FILE)
             .expect("Should save image");
-        update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
+        update_frame(img.width(), img.height(), SAVED_FILE);
     });
     but_histogram.set_callback(move |_| {
         let img = image::open(SAVED_FILE)
@@ -253,7 +253,7 @@ fn make_ui() {
             &image_ops::make_histogram(&image_ops::make_gray_image(&img)),
             HISTOGRAM,
         );
-        update_frame(img.width() as i32, img.height() as i32, HISTOGRAM);
+        update_frame(img.width(), img.height(), HISTOGRAM);
     });
 
     but_gauss.set_callback(move |_| {
@@ -286,7 +286,7 @@ fn make_ui() {
     but_reset.set_callback(move |_| {
         let img = image::open(COPIED_FILE).expect("Should open image");
         img.save(SAVED_FILE).ok();
-        update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
+        update_frame(img.width(), img.height(), SAVED_FILE);
     });
     but_custom_kernel.set_callback(move |_| {
         let custom_kernel = [
@@ -314,6 +314,14 @@ fn make_ui() {
     app.run().ok();
 }
 
+fn calc_window_height(height: u32) -> i32 {
+    (height + 150).max(400) as i32
+}
+
+fn calc_window_width(width: u32) -> i32 {
+    (width + 100).max(700) as i32
+}
+
 fn turn_image_to_grayscale() -> image::ImageBuffer<image::Rgb<u8>, Vec<u8>> {
     let img = image::open(SAVED_FILE)
         .expect("Should open image")
@@ -334,12 +342,12 @@ fn apply_kernel_to_image(kernel: [[f32; 3]; 3], should_clamp: bool, turn_gray: b
     image_ops::apply_conv(kernel, &image, should_clamp)
         .save(SAVED_FILE)
         .expect("Should save image");
-    update_frame(image.width() as i32, image.height() as i32, SAVED_FILE);
+    update_frame(image.width(), image.height(), SAVED_FILE);
 }
 
-fn update_frame(width: i32, height: i32, file_path: &'static str) {
-    let window_width = (width + 100).max(500) as i32;
-    let window_height = (height).max(400) as i32;
+fn update_frame(width: u32, height: u32, file_path: &'static str) {
+    let window_width = calc_window_width(width);
+    let window_height = calc_window_height(height);
     let width = width as i32;
     let height = height as i32;
     let mut window = Window::new(window_width, 0, window_width, window_height + 50, "Result");
