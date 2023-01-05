@@ -71,3 +71,28 @@ pub(crate) fn vertical_flip(image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffe
     }
     return output;
 }
+
+
+pub(crate) fn rotate_90_degrees_left(image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
+    let width = image.width();
+    let mut output: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(width, image.height());
+    let height = image.height();
+    for x in 0..width {
+        for y in 0..height {
+            output.put_pixel(y, height-x-1, image.get_pixel(x, y).clone());
+        }
+    }
+    return output;
+}
+
+pub(crate) fn rotate_90_degrees_right(image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
+    let width = image.width();
+    let mut output: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(width, image.height());
+    let height = image.height();
+    for x in 0..width {
+        for y in 0..height {
+            output.put_pixel(width-y-1,x, image.get_pixel(x, y).clone());
+        }
+    }
+    return output;
+}

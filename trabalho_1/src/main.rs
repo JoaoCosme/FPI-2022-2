@@ -163,6 +163,15 @@ fn make_ui() {
         .right_of(&but_sobel_hy, 5)
         .with_label("Reset");
 
+    let mut but_rotate_left: Button = Button::default()
+        .with_size((window_width - 100) / 5, 20)
+        .below_of(&but_custom_kernel, 5)
+        .with_label("Rotate Left");
+    let mut but_rotate_right: Button = Button::default()
+        .with_size((window_width - 100) / 5, 20)
+        .right_of(&but_rotate_left, 5)
+        .with_label("Rotate Right");
+
     equalize_val.set_value("0");
     kernel_0.set_value("0");
     kernel_1.set_value("0");
@@ -309,9 +318,29 @@ fn make_ui() {
         apply_kernel_to_image(custom_kernel, false, true);
     });
 
+    but_rotate_left.set_callback(move |_| {
+        rotate(&image_ops::point_ops::rotate_90_degrees_left);
+    });
+
+    but_rotate_right.set_callback(move |_| {
+        rotate(&image_ops::point_ops::rotate_90_degrees_right);
+    });
+
     window.make_resizable(false);
     window.show();
     app.run().ok();
+}
+
+fn rotate(
+    func: &dyn Fn(
+        &image::ImageBuffer<image::Rgb<u8>, Vec<u8>>,
+    ) -> image::ImageBuffer<image::Rgb<u8>, Vec<u8>>,
+) {
+    let img = image::open(SAVED_FILE)
+        .expect("Should open image")
+        .into_rgb8();
+    func(&img).save(SAVED_FILE).expect("Should save image");
+    update_frame(img.width(), img.height(), SAVED_FILE);
 }
 
 fn calc_window_height(height: u32) -> i32 {
