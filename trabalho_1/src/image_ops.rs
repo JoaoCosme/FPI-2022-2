@@ -7,7 +7,6 @@ use plotters::prelude::*;
 use image::ImageBuffer;
 
 use image::Pixel;
-use show_image::winit::platform::unix::x11::ffi::XI_RawKeyReleaseMask;
 use std::ops::Div;
 
 pub(crate) fn make_gray_image(image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
@@ -195,6 +194,10 @@ pub fn apply_conv(kernel:[[f32;3];3],image:&ImageBuffer<Rgb<u8>,Vec<u8>>) -> Ima
             result[0] = adjust_pixel_value(result[0]);
             result[1] = adjust_pixel_value(result[1]);
             result[2] = adjust_pixel_value(result[2]);
+
+            if result[0] > 255.0 || result[0] < 0.0 {
+                panic!("Incorrect value!");
+            }
 
             output.put_pixel(x, y, Rgb([
                 result[0] as u8,
