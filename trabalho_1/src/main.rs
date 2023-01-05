@@ -14,7 +14,6 @@ use fltk::{
     window::Window,
 };
 
-
 const SAVED_FILE: &'static str = "./loaded_image.jpeg";
 const HISTOGRAM: &'static str = "./histogram.jpeg";
 
@@ -43,8 +42,8 @@ fn make_ui() {
     pick_file();
     let img = image::open(SAVED_FILE).expect("Should open image");
     let (width, height) = img.dimensions();
-    let window_width = (width + 40).max(500) as i32;
-    let window_height = (height + 20).max(400) as i32;
+    let window_width = (width + 100).max(500) as i32;
+    let window_height = (height + 100).max(400) as i32;
     let width = width as i32;
     let height = height as i32;
     let app = app::App::default();
@@ -92,10 +91,34 @@ fn make_ui() {
         .with_size((window_width - 100) / 5, 20)
         .right_of(&but_negative, 5)
         .with_label("Histogram");
-        let mut but_laplacian = Button::default()
+    let mut but_laplacian = Button::default()
         .with_size((window_width - 100) / 5, 20)
-        .right_of(&but_histogram, 5)
+        .below_of(&but_histogram, 5)
         .with_label("LaPlacian");
+    let mut but_gauss = Button::default()
+        .with_size((window_width - 100) / 5, 20)
+        .below_of(&equalize_val, 5)
+        .with_label("Gaussian");
+    let mut but_passa_alta = Button::default()
+        .with_size((window_width - 100) / 5, 20)
+        .right_of(&but_gauss, 5)
+        .with_label("Passa Alta");
+    let mut but_pw_hx = Button::default()
+        .with_size((window_width - 100) / 5, 20)
+        .right_of(&but_passa_alta, 5)
+        .with_label("Prewitt Hx");
+    let mut but_pw_hy = Button::default()
+        .with_size((window_width - 100) / 5, 20)
+        .right_of(&but_pw_hx, 5)
+        .with_label("Prewitt Hy");
+    let mut but_sobel_hx = Button::default()
+        .with_size((window_width - 100) / 5, 20)
+        .below_of(&but_gauss, 5)
+        .with_label("Sobel Hx");
+    let mut but_sobel_hy = Button::default()
+        .with_size((window_width - 100) / 5, 20)
+        .right_of(&but_sobel_hx, 5)
+        .with_label("Sobel Hy");
 
     equalize_val.set_value("0");
 
@@ -106,8 +129,8 @@ fn make_ui() {
         image_ops::horizontal_flip(&img)
             .save(SAVED_FILE)
             .expect("Should save image");
-            update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
-        });
+        update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
+    });
     but_gray.set_callback(move |_| {
         let img = image::open(SAVED_FILE)
             .expect("Should open image")
@@ -115,8 +138,8 @@ fn make_ui() {
         image_ops::make_gray_image(&img)
             .save(SAVED_FILE)
             .expect("Should save image");
-            update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
-        });
+        update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
+    });
     but_vertical.set_callback(move |_| {
         let img = image::open(SAVED_FILE)
             .expect("Should open image")
@@ -124,8 +147,8 @@ fn make_ui() {
         image_ops::vertical_flip(&img)
             .save(SAVED_FILE)
             .expect("Should save image");
-            update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
-        });
+        update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
+    });
     but_equalize.set_callback(move |_| {
         let img = image::open(SAVED_FILE)
             .expect("Should open image")
@@ -155,60 +178,65 @@ fn make_ui() {
     });
     but_bright.set_callback(move |_| {
         let img = image::open(SAVED_FILE)
-        .expect("Should open image")
-        .into_rgb8();
-        image_ops::apply_point_operation(&img,1.0,10.0)
-        .save(SAVED_FILE)
-        .expect("Should save image");
-    update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
+            .expect("Should open image")
+            .into_rgb8();
+        image_ops::apply_point_operation(&img, 1.0, 10.0)
+            .save(SAVED_FILE)
+            .expect("Should save image");
+        update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
     });
     but_contrast.set_callback(move |_| {
         let img = image::open(SAVED_FILE)
-        .expect("Should open image")
-        .into_rgb8();
-        image_ops::apply_point_operation(&img,0.25,0.0)
-        .save(SAVED_FILE)
-        .expect("Should save image");
-    update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
+            .expect("Should open image")
+            .into_rgb8();
+        image_ops::apply_point_operation(&img, 0.25, 0.0)
+            .save(SAVED_FILE)
+            .expect("Should save image");
+        update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
     });
 
     but_negative.set_callback(move |_| {
         let img = image::open(SAVED_FILE)
-        .expect("Should open image")
-        .into_rgb8();
-        image_ops::apply_point_operation(&img,-1.0,255.0)
-        .save(SAVED_FILE)
-        .expect("Should save image");
-    update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
+            .expect("Should open image")
+            .into_rgb8();
+        image_ops::apply_point_operation(&img, -1.0, 255.0)
+            .save(SAVED_FILE)
+            .expect("Should save image");
+        update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
     });
     but_histogram.set_callback(move |_| {
         let img = image::open(SAVED_FILE)
-        .expect("Should open image")
-        .into_rgb8();
+            .expect("Should open image")
+            .into_rgb8();
         image_ops::draw_histogram(
-        &image_ops::make_histogram(
-            &image_ops::make_gray_image(&img)
-        ),HISTOGRAM);
-    update_frame(img.width() as i32, img.height() as i32,HISTOGRAM);
+            &image_ops::make_histogram(&image_ops::make_gray_image(&img)),
+            HISTOGRAM,
+        );
+        update_frame(img.width() as i32, img.height() as i32, HISTOGRAM);
     });
-    let gauss = [[0.0625,0.125,0.0625],[0.125 ,0.25 ,0.125], [0.0625,0.125 ,0.0625]];
-    let laplacian = [[0.0,-1.0,0.0],[-1.0,4.0,-1.0],[0.0,-1.0,0.0]];
+    let gauss = [
+        [0.0625, 0.125, 0.0625],
+        [0.125, 0.25, 0.125],
+        [0.0625, 0.125, 0.0625],
+    ];
+    let laplacian = [[0.0, -1.0, 0.0], [-1.0, 4.0, -1.0], [0.0, -1.0, 0.0]];
+
     but_laplacian.set_callback(move |_| {
         let img = image::open(SAVED_FILE)
             .expect("Should open image")
             .into_rgb8();
-        image_ops::apply_conv(laplacian,&img)
+        image_ops::apply_conv(laplacian, &img, false)
             .save(SAVED_FILE)
             .expect("Should save image");
-            update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
-        });
+        update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
+    });
 
     window.make_resizable(false);
     window.show();
     app.run().ok();
 }
 
-fn update_frame(width: i32, height: i32,file_path:&'static str) {
+fn update_frame(width: i32, height: i32, file_path: &'static str) {
     let window_width = (width + 100).max(500) as i32;
     let window_height = (height).max(400) as i32;
     let width = width as i32;
@@ -220,4 +248,3 @@ fn update_frame(width: i32, height: i32,file_path:&'static str) {
     frame.set_image(Some(image));
     window.show();
 }
-
