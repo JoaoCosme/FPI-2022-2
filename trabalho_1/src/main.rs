@@ -16,6 +16,7 @@ use fltk::{
 };
 
 const SAVED_FILE: &'static str = "./loaded_image.jpeg";
+const COPIED_FILE: &'static str = "./copy.jpeg";
 const HISTOGRAM: &'static str = "./histogram.jpeg";
 
 fn main() {
@@ -33,9 +34,13 @@ fn pick_file() {
     while file_chooser.shown() {
         app::wait();
     }
-    image::open(file_chooser.value(0).expect("Should have choosen file"))
-        .expect("Should open image")
+    let dynamic_image = image::open(file_chooser.value(0).expect("Should have choosen file"))
+        .expect("Should open image");
+    dynamic_image
         .save(SAVED_FILE)
+        .expect("Should save opened image");
+        dynamic_image
+        .save(COPIED_FILE)
         .expect("Should save opened image");
 }
 
@@ -116,10 +121,15 @@ fn make_ui() {
         .with_size((window_width - 100) / 5, 20)
         .below_of(&but_gauss, 5)
         .with_label("Sobel Hx");
-    let mut but_sobel_hy = Button::default()
+    let mut but_sobel_hy: Button = Button::default()
         .with_size((window_width - 100) / 5, 20)
         .right_of(&but_sobel_hx, 5)
         .with_label("Sobel Hy");
+
+        let mut but_reset: Button = Button::default()
+        .with_size((window_width - 100) / 5, 20)
+        .right_of(&but_sobel_hx, 5)
+        .with_label("Reset");
 
     equalize_val.set_value("0");
 
@@ -222,27 +232,33 @@ fn make_ui() {
     });
 
     but_gauss.set_callback(move |_| {
-        apply_kernel_to_image(kernel::LAPLACIAN,false);
+        apply_kernel_to_image(kernel::GAUSS,false);
     });
 
     but_passa_alta.set_callback(move |_| {
-        apply_kernel_to_image(kernel::LAPLACIAN,false);
+        apply_kernel_to_image(kernel::PASSA_ALTA,true);
     });
 
     but_pw_hx.set_callback(move |_| {
-        apply_kernel_to_image(kernel::LAPLACIAN,false);
+        apply_kernel_to_image(kernel::PREWITT_HX,true);
     });
 
     but_pw_hy.set_callback(move |_| {
-        apply_kernel_to_image(kernel::LAPLACIAN,false);
+        apply_kernel_to_image(kernel::PREWITT_HY,true);
     });
 
     but_sobel_hx.set_callback(move |_| {
-        apply_kernel_to_image(kernel::LAPLACIAN,false);
+        apply_kernel_to_image(kernel::SOBEL_HX,true);
     });
 
     but_sobel_hy.set_callback(move |_| {
-        apply_kernel_to_image(kernel::LAPLACIAN,false);
+        apply_kernel_to_image(kernel::SOBEL_HY,true);
+    });
+    but_reset.set_callback(move |_|{
+        let img = image::open(COPIED_FILE)
+        .expect("Should open image");
+        img.save(SAVED_FILE).ok();
+        update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
     });
 
     window.make_resizable(false);
@@ -250,14 +266,14 @@ fn make_ui() {
     app.run().ok();
 }
 
-fn apply_kernel_to_image(laplacian: [[f32; 3]; 3],should_clamp:bool) {
-    let img = image::open(SAVED_FILE)
+fn apply_kernel_to_image(kernel: [[f32; 3]; 3],should_clamp:bool) {
+    let image = image::open(SAVED_FILE)
         .expect("Should open image")
         .into_rgb8();
-    image_ops::apply_conv(laplacian, &img, should_clamp)
+    image_ops::apply_conv(kernel, &image, should_clamp)
         .save(SAVED_FILE)
         .expect("Should save image");
-    update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
+    update_frame(image.width() as i32, image.height() as i32, SAVED_FILE);
 }
 
 fn update_frame(width: i32, height: i32, file_path: &'static str) {
