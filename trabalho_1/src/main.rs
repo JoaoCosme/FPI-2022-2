@@ -1,7 +1,7 @@
 mod image_ops;
+mod kernel;
 mod matrix_ops;
 mod test;
-mod kernel;
 use image::GenericImageView;
 const COLOR_NUMBER: usize = 256;
 use fltk::{
@@ -39,7 +39,7 @@ fn pick_file() {
     dynamic_image
         .save(SAVED_FILE)
         .expect("Should save opened image");
-        dynamic_image
+    dynamic_image
         .save(COPIED_FILE)
         .expect("Should save opened image");
 }
@@ -49,7 +49,7 @@ fn make_ui() {
     let img = image::open(SAVED_FILE).expect("Should open image");
     let (width, height) = img.dimensions();
     let window_width = (width + 100).max(500) as i32;
-    let window_height = (height + 100).max(400) as i32;
+    let window_height = (height + 150).max(400) as i32;
     let width = width as i32;
     let height = height as i32;
     let app = app::App::default();
@@ -126,12 +126,53 @@ fn make_ui() {
         .right_of(&but_sobel_hx, 5)
         .with_label("Sobel Hy");
 
-        let mut but_reset: Button = Button::default()
+    let mut kernel_0 = Input::default()
+        .size_of(&but_equalize)
+        .below_of(&but_sobel_hx, 1);
+    let mut kernel_1 = Input::default()
+        .size_of(&but_equalize)
+        .right_of(&kernel_0, 1);
+    let mut kernel_2 = Input::default()
+        .size_of(&but_equalize)
+        .right_of(&kernel_1, 1);
+    let mut kernel_3 = Input::default()
+        .size_of(&but_equalize)
+        .below_of(&kernel_0, 1);
+    let mut kernel_4 = Input::default()
+        .size_of(&but_equalize)
+        .right_of(&kernel_3, 1);
+    let mut kernel_5 = Input::default()
+        .size_of(&but_equalize)
+        .right_of(&kernel_4, 1);
+    let mut kernel_6 = Input::default()
+        .size_of(&but_equalize)
+        .below_of(&kernel_3, 1);
+    let mut kernel_7 = Input::default()
+        .size_of(&but_equalize)
+        .right_of(&kernel_6, 1);
+    let mut kernel_8 = Input::default()
+        .size_of(&but_equalize)
+        .right_of(&kernel_7, 1);
+    let mut but_custom_kernel: Button = Button::default()
         .with_size((window_width - 100) / 5, 20)
-        .right_of(&but_sobel_hx, 5)
+        .right_of(&kernel_8, 1)
+        .with_label("Custom Kernel");
+
+    let mut but_reset: Button = Button::default()
+        .with_size((window_width - 100) / 5, 20)
+        .right_of(&but_sobel_hy, 5)
         .with_label("Reset");
 
     equalize_val.set_value("0");
+    kernel_0.set_value("0");
+    kernel_1.set_value("0");
+    kernel_2.set_value("0");
+    kernel_3.set_value("0");
+    kernel_4.set_value("0");
+    kernel_5.set_value("0");
+    kernel_6.set_value("0");
+    kernel_7.set_value("0");
+    kernel_8.set_value("0");
 
     but_horizontal.set_callback(move |_| {
         let img = image::open(SAVED_FILE)
@@ -143,12 +184,7 @@ fn make_ui() {
         update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
     });
     but_gray.set_callback(move |_| {
-        let img = image::open(SAVED_FILE)
-            .expect("Should open image")
-            .into_rgb8();
-        image_ops::make_gray_image(&img)
-            .save(SAVED_FILE)
-            .expect("Should save image");
+        let img = turn_image_to_grayscale();
         update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
     });
     but_vertical.set_callback(move |_| {
@@ -164,13 +200,10 @@ fn make_ui() {
         let img = image::open(SAVED_FILE)
             .expect("Should open image")
             .into_rgb8();
+        let num_of_colors = fetch_input_val(&equalize_val);
         image_ops::equalize_image(
             &img,
-            equalize_val
-                .value()
-                .trim()
-                .parse()
-                .expect("Should have number!"),
+            num_of_colors,
         )
         .save(SAVED_FILE)
         .expect("Should save image");
@@ -226,39 +259,45 @@ fn make_ui() {
         update_frame(img.width() as i32, img.height() as i32, HISTOGRAM);
     });
 
-
     but_laplacian.set_callback(move |_| {
-        apply_kernel_to_image(kernel::LAPLACIAN,false);
+        apply_kernel_to_image(kernel::LAPLACIAN, false,false);
     });
 
     but_gauss.set_callback(move |_| {
-        apply_kernel_to_image(kernel::GAUSS,false);
+        apply_kernel_to_image(kernel::GAUSS, false,true);
     });
 
     but_passa_alta.set_callback(move |_| {
-        apply_kernel_to_image(kernel::PASSA_ALTA,true);
+        apply_kernel_to_image(kernel::PASSA_ALTA, false,true);
     });
 
     but_pw_hx.set_callback(move |_| {
-        apply_kernel_to_image(kernel::PREWITT_HX,true);
+        apply_kernel_to_image(kernel::PREWITT_HX, true,true);
     });
 
     but_pw_hy.set_callback(move |_| {
-        apply_kernel_to_image(kernel::PREWITT_HY,true);
+        apply_kernel_to_image(kernel::PREWITT_HY, true,true);
     });
 
     but_sobel_hx.set_callback(move |_| {
-        apply_kernel_to_image(kernel::SOBEL_HX,true);
+        apply_kernel_to_image(kernel::SOBEL_HX, true, true);
     });
 
     but_sobel_hy.set_callback(move |_| {
-        apply_kernel_to_image(kernel::SOBEL_HY,true);
+        apply_kernel_to_image(kernel::SOBEL_HY, true,true);
     });
-    but_reset.set_callback(move |_|{
-        let img = image::open(COPIED_FILE)
-        .expect("Should open image");
+    but_reset.set_callback(move |_| {
+        let img = image::open(COPIED_FILE).expect("Should open image");
         img.save(SAVED_FILE).ok();
         update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
+    });
+    but_custom_kernel.set_callback(move |_| {
+        let custom_kernel= [
+            [fetch_input_val(&kernel_0) as f32 ,fetch_input_val(&kernel_1) as f32,fetch_input_val(&kernel_2) as f32],
+            [fetch_input_val(&kernel_3) as f32 ,fetch_input_val(&kernel_4) as f32,fetch_input_val(&kernel_5) as f32],
+            [fetch_input_val(&kernel_6) as f32 ,fetch_input_val(&kernel_7) as f32,fetch_input_val(&kernel_8) as f32],
+        ];
+        apply_kernel_to_image(custom_kernel, false,true);
     });
 
     window.make_resizable(false);
@@ -266,7 +305,19 @@ fn make_ui() {
     app.run().ok();
 }
 
-fn apply_kernel_to_image(kernel: [[f32; 3]; 3],should_clamp:bool) {
+fn turn_image_to_grayscale() -> image::ImageBuffer<image::Rgb<u8>, Vec<u8>> {
+    let img = image::open(SAVED_FILE)
+        .expect("Should open image")
+        .into_rgb8();
+    image_ops::make_gray_image(&img)
+        .save(SAVED_FILE)
+        .expect("Should save image");
+    img
+}
+
+
+fn apply_kernel_to_image(kernel: [[f32; 3]; 3], should_clamp: bool, turn_gray:bool) {
+    if turn_gray{turn_image_to_grayscale();}
     let image = image::open(SAVED_FILE)
         .expect("Should open image")
         .into_rgb8();
@@ -288,3 +339,12 @@ fn update_frame(width: i32, height: i32, file_path: &'static str) {
     frame.set_image(Some(image));
     window.show();
 }
+
+fn fetch_input_val(input:&Input) -> i32 {
+    input
+            .value()
+            .trim()
+            .parse()
+            .expect("Should have number!")
+}
+
