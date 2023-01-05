@@ -1,6 +1,7 @@
 mod image_ops;
 mod matrix_ops;
 mod test;
+mod kernel;
 use image::GenericImageView;
 const COLOR_NUMBER: usize = 256;
 use fltk::{
@@ -214,26 +215,49 @@ fn make_ui() {
         );
         update_frame(img.width() as i32, img.height() as i32, HISTOGRAM);
     });
-    let gauss = [
-        [0.0625, 0.125, 0.0625],
-        [0.125, 0.25, 0.125],
-        [0.0625, 0.125, 0.0625],
-    ];
-    let laplacian = [[0.0, -1.0, 0.0], [-1.0, 4.0, -1.0], [0.0, -1.0, 0.0]];
+
 
     but_laplacian.set_callback(move |_| {
-        let img = image::open(SAVED_FILE)
-            .expect("Should open image")
-            .into_rgb8();
-        image_ops::apply_conv(laplacian, &img, false)
-            .save(SAVED_FILE)
-            .expect("Should save image");
-        update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
+        apply_kernel_to_image(kernel::LAPLACIAN,false);
+    });
+
+    but_gauss.set_callback(move |_| {
+        apply_kernel_to_image(kernel::LAPLACIAN,false);
+    });
+
+    but_passa_alta.set_callback(move |_| {
+        apply_kernel_to_image(kernel::LAPLACIAN,false);
+    });
+
+    but_pw_hx.set_callback(move |_| {
+        apply_kernel_to_image(kernel::LAPLACIAN,false);
+    });
+
+    but_pw_hy.set_callback(move |_| {
+        apply_kernel_to_image(kernel::LAPLACIAN,false);
+    });
+
+    but_sobel_hx.set_callback(move |_| {
+        apply_kernel_to_image(kernel::LAPLACIAN,false);
+    });
+
+    but_sobel_hy.set_callback(move |_| {
+        apply_kernel_to_image(kernel::LAPLACIAN,false);
     });
 
     window.make_resizable(false);
     window.show();
     app.run().ok();
+}
+
+fn apply_kernel_to_image(laplacian: [[f32; 3]; 3],should_clamp:bool) {
+    let img = image::open(SAVED_FILE)
+        .expect("Should open image")
+        .into_rgb8();
+    image_ops::apply_conv(laplacian, &img, should_clamp)
+        .save(SAVED_FILE)
+        .expect("Should save image");
+    update_frame(img.width() as i32, img.height() as i32, SAVED_FILE);
 }
 
 fn update_frame(width: i32, height: i32, file_path: &'static str) {
