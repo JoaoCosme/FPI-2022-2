@@ -178,7 +178,7 @@ fn make_ui() {
         let img = image::open(SAVED_FILE)
             .expect("Should open image")
             .into_rgb8();
-        image_ops::horizontal_flip(&img)
+        image_ops::point_ops::horizontal_flip(&img)
             .save(SAVED_FILE)
             .expect("Should save image");
         update_frame(img.width(), img.height(), SAVED_FILE);
@@ -191,7 +191,7 @@ fn make_ui() {
         let img = image::open(SAVED_FILE)
             .expect("Should open image")
             .into_rgb8();
-        image_ops::vertical_flip(&img)
+        image_ops::point_ops::vertical_flip(&img)
             .save(SAVED_FILE)
             .expect("Should save image");
         update_frame(img.width(), img.height(), SAVED_FILE);
@@ -250,7 +250,7 @@ fn make_ui() {
             .expect("Should open image")
             .into_rgb8();
         image_ops::draw_histogram(
-            &image_ops::make_histogram(&image_ops::make_gray_image(&img)),
+            &image_ops::point_ops::make_histogram(&image_ops::point_ops::make_gray_image(&img)),
             HISTOGRAM,
         );
         update_frame(img.width(), img.height(), HISTOGRAM);
@@ -326,7 +326,7 @@ fn turn_image_to_grayscale() -> image::ImageBuffer<image::Rgb<u8>, Vec<u8>> {
     let img = image::open(SAVED_FILE)
         .expect("Should open image")
         .into_rgb8();
-    image_ops::make_gray_image(&img)
+    image_ops::point_ops::make_gray_image(&img)
         .save(SAVED_FILE)
         .expect("Should save image");
     img

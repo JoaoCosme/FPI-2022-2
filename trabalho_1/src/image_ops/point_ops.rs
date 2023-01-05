@@ -1,5 +1,6 @@
 use super::super::COLOR_NUMBER;
 
+use image::Pixel;
 use image::Rgb;
 
 use image::ImageBuffer;

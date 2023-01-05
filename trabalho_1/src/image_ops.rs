@@ -1,5 +1,3 @@
-use super::COLOR_NUMBER;
-
 use image::Rgb;
 use plotters::prelude::*;
 
@@ -9,7 +7,7 @@ use image::ImageBuffer;
 use image::Pixel;
 use std::ops::Div;
 
-mod point_ops;
+pub mod point_ops;
 
 pub(crate) fn equalize_image(image: &ImageBuffer<Rgb<u8>, Vec<u8>>, num_of_colors: i32) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
     let image_gray = point_ops::make_gray_image(&image);
@@ -81,14 +79,14 @@ pub fn apply_point_operation(image:&ImageBuffer<Rgb<u8>,Vec<u8>>, a: f32, b:f32)
 
 
 pub fn draw_histogram(histogram:&[usize;256], path:&'static str){
-    let maxY = histogram.iter().cloned().fold(0 as usize, usize::max);
+    let max_y = histogram.iter().cloned().fold(0 as usize, usize::max);
     let root_area = BitMapBackend::new(path,(600,400)).into_drawing_area();
     root_area.fill(&WHITE).unwrap();
     let mut ctx = ChartBuilder::on(&root_area)
     .set_label_area_size(LabelAreaPosition::Left, 40)
     .set_label_area_size(LabelAreaPosition::Bottom, 40)
     .caption("Histograma",("sans-serif",40))
-    .build_cartesian_2d((0..256).into_segmented(), 0..maxY)
+    .build_cartesian_2d((0..256).into_segmented(), 0..max_y)
     .unwrap();
   
     ctx.configure_mesh().draw().unwrap();
@@ -109,13 +107,10 @@ pub fn apply_conv(kernel:[[f32;3];3],image:&ImageBuffer<Rgb<u8>,Vec<u8>>,should_
     for x in 1..width-1 {
         for y in 1..height-1{
             let mut result = [0.0,0.0,0.0];
-            let mut a = 0;
             for i in 0..=2{
                 for j in 0..=2{
                     let disloc_x = i as i32-1;
                     let disloc_y = j as i32-1;
-
-                    a+=1;
 
                     let pixel = image.get_pixel((x as i32 + disloc_x) as u32, (y as i32 + disloc_y) as u32);
                     // dbg!(disloc_y,disloc_x,kernel[i as usize][j as usize],pixel);
