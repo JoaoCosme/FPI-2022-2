@@ -117,12 +117,12 @@ pub(crate) fn zoom_out(
     let mut output: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(new_width, new_height);
     let num_of_itens = (sx * sy) as i32;
 
-    for x in (0..width).step_by(sx as usize) {
-        for y in (0..height).step_by(sy as usize) {
+    for x in (0..=(width-sx as u32)).step_by(sx as usize) {
+        for y in (0..=(height-sy as u32)).step_by(sy as usize) {
             output.put_pixel(
-                x / sx as u32,
-                y / sy as u32,
-                reduce_pixel_area(sx, sy, image, x, width, y, height, num_of_itens),
+                (x / sx as u32),
+                (y / sy as u32),
+                reduce_pixel_area(sx, sy, image, height, width, x, y, num_of_itens),
             );
         }
     }
@@ -133,10 +133,10 @@ fn reduce_pixel_area(
     sx: f32,
     sy: f32,
     image: &ImageBuffer<Rgb<u8>, Vec<u8>>,
-    x: u32,
-    width: u32,
-    y: u32,
     height: u32,
+    width: u32,
+    x: u32,
+    y: u32,
     num_of_itens: i32,
 ) -> Rgb<u8> {
     let mut result = vec![];
