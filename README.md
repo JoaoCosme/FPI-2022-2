@@ -1,4 +1,4 @@
-# FPI-UFRGS-2022-2
+# Fundamentals of Image Processing UFRGS 2022/2
 
 <a href="https://gitmoji.dev">
   <img
