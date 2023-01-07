@@ -117,17 +117,17 @@ pub(crate) fn zoom_out(
     let mut output: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(new_width, new_height);
     let num_of_itens = (sx * sy) as i32;
 
-    for x in 0..width {
-        for y in 0..height {
+    for x in (0..width).step_by(sx as usize) {
+        for y in (0..height).step_by(sy as usize) {
             let mut result = vec![];
 
-            for i in 0..=sx as u32 {
-                for j in 0..=sy as u32 {
-                    result.push(image.get_pixel(x, y));
+            for i in 0..sx as u32 {
+                for j in 0..sy as u32 {
+                    result.push(image.get_pixel((x+i).min(width-1), (y+j).min(height-1)));
                 }
             }
 
-            let mut final_value = result
+            let final_value = result
                 .into_iter()
                 .map(|pixel| [pixel[0] as i32, pixel[1] as i32, pixel[2] as i32])
                 .reduce(|pixel_a, pixel_b| {

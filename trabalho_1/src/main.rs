@@ -201,8 +201,8 @@ fn make_ui() {
     kernel_6.set_value("0");
     kernel_7.set_value("0");
     kernel_8.set_value("0");
-    out_sy.set_value("0");
-    out_sx.set_value("0");
+    out_sy.set_value("2");
+    out_sx.set_value("2");
 
     but_horizontal.set_callback(move |_| {
         apply_function_to_image(&image_ops::point_ops::horizontal_flip);
