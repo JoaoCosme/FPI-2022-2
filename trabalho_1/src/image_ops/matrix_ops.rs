@@ -1,3 +1,5 @@
+use std::time::Instant;
+
 use image::Rgb;
 
 use image::ImageBuffer;
@@ -64,18 +66,16 @@ pub(self) fn adjust_pixel_value(pixel: f32) -> f32 {
 }
 
 pub(crate) fn zoom_in(image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
-    let width = image.width();
+    let (width, height) = image.dimensions();
     let new_width = width * 2;
-    let height = image.height();
     let new_height = height * 2;
+    let before = Instant::now();
     let mut output: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(new_width, new_height);
 
-    for x in (0..new_width).step_by(2) {
-        for y in (0..new_height).step_by(2) {
-            let base_image_x = x / 2;
-            let base_image_y_ = y / 2;
-            let pixel = image.get_pixel(base_image_x, base_image_y_);
-            output.put_pixel(x, y, *pixel);
+    for x in (0..width) {
+        for y in (0..height) {
+            let pixel = image.get_pixel(x, y);
+            output.put_pixel(x * 2, y * 2, *pixel);
         }
     }
 
@@ -98,7 +98,7 @@ pub(crate) fn zoom_in(image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffer<Rgb<
             );
         }
     }
-
+    println!("Elapsed time: {:.2?}", before.elapsed());
     return output;
 }
 
