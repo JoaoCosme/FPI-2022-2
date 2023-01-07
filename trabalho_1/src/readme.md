@@ -13,7 +13,7 @@
   - [ ]  Grey
   - [ ]  Color
 - [ ]  Zoom Out
-- [ ]  Zoom In
+- [x]  Zoom In
 - [x]  Rotate
 - [x]  Convolução
 - [ ]  Relatorio

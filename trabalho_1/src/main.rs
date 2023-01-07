@@ -58,6 +58,10 @@ fn make_ui() {
     let mut image = SharedImage::load(SAVED_FILE).unwrap();
     image.scale(width, height, true, true);
     frame.set_image(Some(image));
+
+    let button_width = (window_width - 100) / 5;
+    let button_height = 20;
+    
     let mut but_equalize = Button::default()
         .with_size((window_width - 100) / 5, 20)
         .below_of(&frame, 0)
@@ -175,6 +179,10 @@ fn make_ui() {
     let mut but_zoom_in: Button = Button::default()
         .with_size((window_width - 100) / 5, 20)
         .right_of(&but_rotate_right, 5)
+        .with_label("Zoom in");
+    let mut but_zoom_out: Button = Button::default()
+        .with_size(button_width, button_height)
+        .right_of(&but_zoom_in, 5)
         .with_label("Zoom in");
 
     equalize_val.set_value("0");

@@ -87,7 +87,7 @@ pub(crate) fn zoom_in(image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffer<Rgb<
         }
     }
 
-    for x in (0..new_width) {
+    for x in 0..new_width {
         for y in (1..new_height - 1).step_by(2) {
             output.put_pixel(
                 x,
