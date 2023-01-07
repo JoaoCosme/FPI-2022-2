@@ -63,7 +63,7 @@ fn make_ui() {
     let button_height = 20;
     
     let mut but_equalize = Button::default()
-        .with_size((window_width - 100) / 5, 20)
+        .with_size(button_width, button_height)
         .below_of(&frame, 0)
         .with_label("Equalize");
     let mut but_horizontal = Button::default()
@@ -86,47 +86,47 @@ fn make_ui() {
         .size_of(&but_equalize)
         .below_of(&but_equalize, 1);
     let mut but_bright = Button::default()
-        .with_size((window_width - 100) / 5, 20)
+        .with_size(button_width, button_height)
         .below_of(&but_horizontal, 0)
         .with_label("Bright Up");
     let mut but_contrast = Button::default()
-        .with_size((window_width - 100) / 5, 20)
+        .with_size(button_width, button_height)
         .right_of(&but_bright, 5)
         .with_label("Contrast Up");
     let mut but_negative = Button::default()
-        .with_size((window_width - 100) / 5, 20)
+        .with_size(button_width, button_height)
         .right_of(&but_contrast, 5)
         .with_label("Negative");
     let mut but_histogram = Button::default()
-        .with_size((window_width - 100) / 5, 20)
+        .with_size(button_width, button_height)
         .right_of(&but_negative, 5)
         .with_label("Histogram");
     let mut but_laplacian = Button::default()
-        .with_size((window_width - 100) / 5, 20)
+        .with_size(button_width, button_height)
         .below_of(&but_histogram, 5)
         .with_label("LaPlacian");
     let mut but_gauss = Button::default()
-        .with_size((window_width - 100) / 5, 20)
+        .with_size(button_width, button_height)
         .below_of(&equalize_val, 5)
         .with_label("Gaussian");
     let mut but_passa_alta = Button::default()
-        .with_size((window_width - 100) / 5, 20)
+        .with_size(button_width, button_height)
         .right_of(&but_gauss, 5)
         .with_label("Passa Alta");
     let mut but_pw_hx = Button::default()
-        .with_size((window_width - 100) / 5, 20)
+        .with_size(button_width, button_height)
         .right_of(&but_passa_alta, 5)
         .with_label("Prewitt Hx");
     let mut but_pw_hy = Button::default()
-        .with_size((window_width - 100) / 5, 20)
+        .with_size(button_width, button_height)
         .right_of(&but_pw_hx, 5)
         .with_label("Prewitt Hy");
     let mut but_sobel_hx = Button::default()
-        .with_size((window_width - 100) / 5, 20)
+        .with_size(button_width, button_height)
         .below_of(&but_gauss, 5)
         .with_label("Sobel Hx");
     let mut but_sobel_hy: Button = Button::default()
-        .with_size((window_width - 100) / 5, 20)
+        .with_size(button_width, button_height)
         .right_of(&but_sobel_hx, 5)
         .with_label("Sobel Hy");
 
@@ -157,33 +157,44 @@ fn make_ui() {
     let mut kernel_8 = Input::default()
         .size_of(&but_equalize)
         .right_of(&kernel_7, 1);
+
     let mut but_custom_kernel: Button = Button::default()
-        .with_size((window_width - 100) / 5, 20)
+        .with_size(button_width, button_height)
         .right_of(&kernel_8, 1)
         .with_label("Custom Kernel");
 
     let mut but_reset: Button = Button::default()
-        .with_size((window_width - 100) / 5, 20)
+        .with_size(button_width, button_height)
         .right_of(&but_sobel_hy, 5)
         .with_label("Reset");
 
     let mut but_rotate_left: Button = Button::default()
-        .with_size((window_width - 100) / 5, 20)
+        .with_size(button_width, button_height)
         .below_of(&kernel_6, 5)
         .with_label("Rotate Left");
     let mut but_rotate_right: Button = Button::default()
-        .with_size((window_width - 100) / 5, 20)
+        .with_size(button_width, button_height)
         .right_of(&but_rotate_left, 5)
         .with_label("Rotate Right");
 
     let mut but_zoom_in: Button = Button::default()
-        .with_size((window_width - 100) / 5, 20)
+        .with_size(button_width, button_height)
         .right_of(&but_rotate_right, 5)
         .with_label("Zoom in");
     let mut but_zoom_out: Button = Button::default()
         .with_size(button_width, button_height)
-        .right_of(&but_zoom_in, 5)
-        .with_label("Zoom in");
+        .below_of(&but_rotate_left, 5)
+        .with_label("Zoom out");
+
+
+    let mut out_sx = Input::default()
+    .size_of(&but_zoom_out)
+    .right_of(&but_zoom_out, 1);
+
+
+    let mut out_sy = Input::default()
+        .size_of(&out_sx)
+        .right_of(&out_sx, 1);
 
     equalize_val.set_value("0");
     kernel_0.set_value("0");
@@ -195,6 +206,8 @@ fn make_ui() {
     kernel_6.set_value("0");
     kernel_7.set_value("0");
     kernel_8.set_value("0");
+    out_sy.set_value("0");
+    out_sx.set_value("0");
 
     but_horizontal.set_callback(move |_| {
         apply_function_to_image(&image_ops::point_ops::horizontal_flip);
@@ -331,6 +344,8 @@ fn make_ui() {
         apply_function_to_image(&image_ops::matrix_ops::zoom_in);
     });
 
+    
+
     window.make_resizable(false);
     window.show();
     app.run().ok();
@@ -349,7 +364,7 @@ fn apply_function_to_image(
 }
 
 fn calc_window_height(height: u32) -> i32 {
-    (height + 150).max(400) as i32
+    (height + 150).max(750) as i32
 }
 
 fn calc_window_width(width: u32) -> i32 {
