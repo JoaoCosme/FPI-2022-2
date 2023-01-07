@@ -119,35 +119,52 @@ pub(crate) fn zoom_out(
 
     for x in (0..width).step_by(sx as usize) {
         for y in (0..height).step_by(sy as usize) {
-            let mut result = vec![];
-
-            for i in 0..sx as u32 {
-                for j in 0..sy as u32 {
-                    result.push(image.get_pixel((x+i).min(width-1), (y+j).min(height-1)));
-                }
-            }
-
-            let final_value = result
-                .into_iter()
-                .map(|pixel| [pixel[0] as i32, pixel[1] as i32, pixel[2] as i32])
-                .reduce(|pixel_a, pixel_b| {
-                    [
-                        pixel_a[0] + pixel_b[0],
-                        pixel_a[1] + pixel_b[1],
-                        pixel_a[2] + pixel_b[2],
-                    ]
-                })
-                .map(|accumulated_pixel| {
-                    Rgb([
-                        (accumulated_pixel[0] / num_of_itens) as u8,
-                        (accumulated_pixel[1] / num_of_itens) as u8,
-                        (accumulated_pixel[2] / num_of_itens) as u8,
-                    ])
-                })
-                .expect("Should be able to zoom out image");
-
-            output.put_pixel(x / sx as u32, y / sy as u32, final_value);
+            output.put_pixel(
+                x / sx as u32,
+                y / sy as u32,
+                reduce_pixel_area(sx, sy, image, x, width, y, height, num_of_itens),
+            );
         }
     }
     output
+}
+
+fn reduce_pixel_area(
+    sx: f32,
+    sy: f32,
+    image: &ImageBuffer<Rgb<u8>, Vec<u8>>,
+    x: u32,
+    width: u32,
+    y: u32,
+    height: u32,
+    num_of_itens: i32,
+) -> Rgb<u8> {
+    let mut result = vec![];
+    for i in 0..sx as u32 {
+        for j in 0..sy as u32 {
+            result.push(
+                image
+                    .get_pixel((x + i).min(width - 1), (y + j).min(height - 1))
+                    .0
+                    .map(|a| a as i32),
+            );
+        }
+    }
+    result
+        .into_iter()
+        .reduce(|pixel_a, pixel_b| {
+            [
+                pixel_a[0] + pixel_b[0],
+                pixel_a[1] + pixel_b[1],
+                pixel_a[2] + pixel_b[2],
+            ]
+        })
+        .map(|accumulated_pixel| {
+            Rgb([
+                (accumulated_pixel[0] / num_of_itens) as u8,
+                (accumulated_pixel[1] / num_of_itens) as u8,
+                (accumulated_pixel[2] / num_of_itens) as u8,
+            ])
+        })
+        .expect("Should be able to zoom out image")
 }
