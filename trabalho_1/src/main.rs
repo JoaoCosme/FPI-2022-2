@@ -61,7 +61,7 @@ fn make_ui() {
 
     let button_width = (window_width - 100) / 5;
     let button_height = 20;
-    
+
     let mut but_equalize = Button::default()
         .with_size(button_width, button_height)
         .below_of(&frame, 0)
@@ -181,20 +181,15 @@ fn make_ui() {
         .with_size(button_width, button_height)
         .right_of(&but_rotate_right, 5)
         .with_label("Zoom in");
+
     let mut but_zoom_out: Button = Button::default()
         .with_size(button_width, button_height)
         .below_of(&but_rotate_left, 5)
         .with_label("Zoom out");
-
-
     let mut out_sx = Input::default()
-    .size_of(&but_zoom_out)
-    .right_of(&but_zoom_out, 1);
-
-
-    let mut out_sy = Input::default()
-        .size_of(&out_sx)
-        .right_of(&out_sx, 1);
+        .size_of(&but_zoom_out)
+        .right_of(&but_zoom_out, 1);
+    let mut out_sy = Input::default().size_of(&out_sx).right_of(&out_sx, 1);
 
     equalize_val.set_value("0");
     kernel_0.set_value("0");
@@ -344,7 +339,15 @@ fn make_ui() {
         apply_function_to_image(&image_ops::matrix_ops::zoom_in);
     });
 
-    
+    but_zoom_out.set_callback(move |_| {
+        let img = image::open(SAVED_FILE)
+            .expect("Should open image")
+            .into_rgb8();
+        image_ops::matrix_ops::zoom_out(&img, fetch_input_val(&out_sx), fetch_input_val(&out_sy))
+            .save(SAVED_FILE)
+            .expect("Should save image");
+        update_frame(img.width(), img.height(), SAVED_FILE);
+    });
 
     window.make_resizable(false);
     window.show();

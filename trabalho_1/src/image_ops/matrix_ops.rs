@@ -75,10 +75,10 @@ pub(crate) fn zoom_in(image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffer<Rgb<
         for y in 0..height {
             let pixel = image.get_pixel(x, y);
             output.put_pixel(x * 2, y * 2, *pixel);
-           
-            let interpole_x = (x*2)-if x==0 {0} else {1} ;
-            let interpole_y = (y*2)-if y==0 {0} else {1};
-           
+
+            let interpole_x = (x * 2) - if x == 0 { 0 } else { 1 };
+            let interpole_y = (y * 2) - if y == 0 { 0 } else { 1 };
+
             output.put_pixel(
                 interpole_x,
                 interpole_y,
@@ -96,7 +96,7 @@ pub(crate) fn zoom_in(image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffer<Rgb<
             );
         }
     }
-    return output;
+    output
 }
 
 pub(self) fn interpole_pixel(before_pixel: &Rgb<u8>, after_pixel: &Rgb<u8>) -> Rgb<u8> {
@@ -104,4 +104,50 @@ pub(self) fn interpole_pixel(before_pixel: &Rgb<u8>, after_pixel: &Rgb<u8>) -> R
     let pixel_1 = (before_pixel[1] as i32 + after_pixel[1] as i32) / 2;
     let pixel_2 = (before_pixel[2] as i32 + after_pixel[2] as i32) / 2;
     Rgb([pixel_0 as u8, pixel_1 as u8, pixel_2 as u8])
+}
+
+pub(crate) fn zoom_out(
+    image: &ImageBuffer<Rgb<u8>, Vec<u8>>,
+    sx: f32,
+    sy: f32,
+) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
+    let (width, height) = image.dimensions();
+    let new_width = (width as f32 / sx) as u32;
+    let new_height = (height as f32 / sy) as u32;
+    let mut output: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(new_width, new_height);
+    let num_of_itens = (sx * sy) as i32;
+
+    for x in 0..width {
+        for y in 0..height {
+            let mut result = vec![];
+
+            for i in 0..=sx as u32 {
+                for j in 0..=sy as u32 {
+                    result.push(image.get_pixel(x, y));
+                }
+            }
+
+            let mut final_value = result
+                .into_iter()
+                .map(|pixel| [pixel[0] as i32, pixel[1] as i32, pixel[2] as i32])
+                .reduce(|pixel_a, pixel_b| {
+                    [
+                        pixel_a[0] + pixel_b[0],
+                        pixel_a[1] + pixel_b[1],
+                        pixel_a[2] + pixel_b[2],
+                    ]
+                })
+                .map(|accumulated_pixel| {
+                    Rgb([
+                        (accumulated_pixel[0] / num_of_itens) as u8,
+                        (accumulated_pixel[1] / num_of_itens) as u8,
+                        (accumulated_pixel[2] / num_of_itens) as u8,
+                    ])
+                })
+                .expect("Should be able to zoom out image");
+
+            output.put_pixel(x / sx as u32, y / sy as u32, final_value);
+        }
+    }
+    output
 }
