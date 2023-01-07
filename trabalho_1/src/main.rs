@@ -165,12 +165,17 @@ fn make_ui() {
 
     let mut but_rotate_left: Button = Button::default()
         .with_size((window_width - 100) / 5, 20)
-        .below_of(&but_custom_kernel, 5)
+        .below_of(&kernel_6, 5)
         .with_label("Rotate Left");
     let mut but_rotate_right: Button = Button::default()
         .with_size((window_width - 100) / 5, 20)
         .right_of(&but_rotate_left, 5)
         .with_label("Rotate Right");
+
+    let mut but_zoom_in: Button = Button::default()
+        .with_size((window_width - 100) / 5, 20)
+        .right_of(&but_rotate_right, 5)
+        .with_label("Zoom in");
 
     equalize_val.set_value("0");
     kernel_0.set_value("0");
@@ -312,6 +317,10 @@ fn make_ui() {
 
     but_rotate_right.set_callback(move |_| {
         apply_function_to_image(&image_ops::point_ops::rotate_90_degrees_right);
+    });
+
+    but_zoom_in.set_callback(move |_| {
+        apply_function_to_image(&image_ops::matrix_ops::zoom_in);
     });
 
     window.make_resizable(false);

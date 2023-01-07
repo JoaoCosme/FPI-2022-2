@@ -62,3 +62,49 @@ pub(self) fn adjust_pixel_value(pixel: f32) -> f32 {
         }
     };
 }
+
+pub(crate) fn zoom_in(image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
+    let width = image.width();
+    let new_width = width * 2;
+    let height = image.height();
+    let new_height = height * 2;
+    let mut output: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(new_width, new_height);
+
+    for x in (0..new_width).step_by(2) {
+        for y in (0..new_height).step_by(2) {
+            let base_image_x = x / 2;
+            let base_image_y_ = y / 2;
+            let pixel = image.get_pixel(base_image_x, base_image_y_);
+            output.put_pixel(x, y, *pixel);
+        }
+    }
+
+    for x in (1..new_width - 1).step_by(2) {
+        for y in (0..new_height).step_by(2) {
+            output.put_pixel(
+                x,
+                y,
+                interpole_pixel(output.get_pixel(x - 1, y), output.get_pixel(x + 1, y)),
+            );
+        }
+    }
+
+    for x in (0..new_width) {
+        for y in (1..new_height - 1).step_by(2) {
+            output.put_pixel(
+                x,
+                y,
+                interpole_pixel(output.get_pixel(x, y - 1), output.get_pixel(x, y + 1)),
+            );
+        }
+    }
+
+    return output;
+}
+
+pub(self) fn interpole_pixel(before_pixel: &Rgb<u8>, after_pixel: &Rgb<u8>) -> Rgb<u8> {
+    let pixel_0 = (before_pixel[0] as i32 + after_pixel[0] as i32) / 2;
+    let pixel_1 = (before_pixel[1] as i32 + after_pixel[1] as i32) / 2;
+    let pixel_2 = (before_pixel[2] as i32 + after_pixel[2] as i32) / 2;
+    Rgb([pixel_0 as u8, pixel_1 as u8, pixel_2 as u8])
+}

@@ -6,6 +6,7 @@ use image::ImageBuffer;
 use image::Pixel;
 use std::ops::Div;
 
+pub mod matrix_ops;
 pub mod point_ops;
 
 pub(crate) fn equalize_image(
@@ -107,5 +108,3 @@ pub fn draw_histogram(histogram: &[usize; 256], path: &'static str) {
     }))
     .unwrap();
 }
-
-pub mod matrix_ops;
