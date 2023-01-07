@@ -101,13 +101,10 @@ fn make_ui() {
         .with_size(button_width, button_height)
         .right_of(&but_negative, 5)
         .with_label("Histogram");
-    let mut but_laplacian = Button::default()
-        .with_size(button_width, button_height)
-        .below_of(&but_histogram, 5)
-        .with_label("LaPlacian");
+
     let mut but_gauss = Button::default()
         .with_size(button_width, button_height)
-        .below_of(&equalize_val, 5)
+        .below_of(&equalize_val, button_height)
         .with_label("Gaussian");
     let mut but_passa_alta = Button::default()
         .with_size(button_width, button_height)
@@ -121,6 +118,10 @@ fn make_ui() {
         .with_size(button_width, button_height)
         .right_of(&but_pw_hx, 5)
         .with_label("Prewitt Hy");
+    let mut but_laplacian = Button::default()
+        .with_size(button_width, button_height)
+        .right_of(&but_pw_hy, 5)
+        .with_label("LaPlacian");
     let mut but_sobel_hx = Button::default()
         .with_size(button_width, button_height)
         .below_of(&but_gauss, 5)
@@ -190,6 +191,12 @@ fn make_ui() {
         .size_of(&but_zoom_out)
         .right_of(&but_zoom_out, 1);
     let mut out_sy = Input::default().size_of(&out_sx).right_of(&out_sx, 1);
+    let mut bright_val = Input::default()
+        .size_of(&but_zoom_out)
+        .below_of(&but_bright, 1);
+    let mut contrast_val = Input::default()
+        .size_of(&but_zoom_out)
+        .below_of(&but_contrast, 1);
 
     equalize_val.set_value("0");
     kernel_0.set_value("0");
@@ -203,6 +210,8 @@ fn make_ui() {
     kernel_8.set_value("0");
     out_sy.set_value("2");
     out_sx.set_value("2");
+    bright_val.set_value("0");
+    contrast_val.set_value("0");
 
     but_horizontal.set_callback(move |_| {
         apply_function_to_image(&image_ops::point_ops::horizontal_flip);
@@ -239,7 +248,7 @@ fn make_ui() {
         let img = image::open(SAVED_FILE)
             .expect("Should open image")
             .into_rgb8();
-        image_ops::apply_point_operation(&img, 1.0, 10.0)
+        image_ops::apply_point_operation(&img, 1.0, fetch_input_val(&bright_val))
             .save(SAVED_FILE)
             .expect("Should save image");
         update_frame(img.width(), img.height(), SAVED_FILE);
@@ -248,7 +257,7 @@ fn make_ui() {
         let img = image::open(SAVED_FILE)
             .expect("Should open image")
             .into_rgb8();
-        image_ops::apply_point_operation(&img, 0.25, 0.0)
+        image_ops::apply_point_operation(&img, fetch_input_val(&contrast_val), 0.0)
             .save(SAVED_FILE)
             .expect("Should save image");
         update_frame(img.width(), img.height(), SAVED_FILE);
