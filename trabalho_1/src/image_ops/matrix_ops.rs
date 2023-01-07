@@ -69,22 +69,20 @@ pub(crate) fn zoom_in(image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffer<Rgb<
     let (width, height) = image.dimensions();
     let new_width = width * 2;
     let new_height = height * 2;
-    let before = Instant::now();
     let mut output: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(new_width, new_height);
 
-    for x in (0..width) {
-        for y in (0..height) {
+    for x in 0..width {
+        for y in 0..height {
             let pixel = image.get_pixel(x, y);
             output.put_pixel(x * 2, y * 2, *pixel);
-        }
-    }
-
-    for x in (1..new_width - 1).step_by(2) {
-        for y in (0..new_height).step_by(2) {
+           
+            let interpole_x = (x*2)-if x==0 {0} else {1} ;
+            let interpole_y = (y*2)-if y==0 {0} else {1};
+           
             output.put_pixel(
-                x,
-                y,
-                interpole_pixel(output.get_pixel(x - 1, y), output.get_pixel(x + 1, y)),
+                interpole_x,
+                interpole_y,
+                interpole_pixel(pixel, output.get_pixel(x + 1, y)),
             );
         }
     }
@@ -98,7 +96,6 @@ pub(crate) fn zoom_in(image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffer<Rgb<
             );
         }
     }
-    println!("Elapsed time: {:.2?}", before.elapsed());
     return output;
 }
 
