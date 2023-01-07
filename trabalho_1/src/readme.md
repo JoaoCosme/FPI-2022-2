@@ -1,12 +1,12 @@
 # Todo
 
 - [x] Histograma
-- [ ] Brilho
+- [x] Brilho
   - [x] Operação
-  - [ ] Aumentar/Reduzir
-- [ ] Contraste
+  - [x] Aumentar/Reduzir
+- [x] Contraste
   - [x] Operação
-  - [ ] Aumentar/Reduzir
+  - [x] Aumentar/Reduzir
 - [x] Negativo
 - [x] Equalização
 - [ ] Histogram Matching
