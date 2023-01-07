@@ -197,7 +197,7 @@ fn make_ui() {
         let img = image::open(SAVED_FILE)
             .expect("Should open image")
             .into_rgb8();
-        let num_of_colors = fetch_input_val(&equalize_val);
+        let num_of_colors = fetch_input_val(&equalize_val) as i32;
         image_ops::equalize_image(&img, num_of_colors)
             .save(SAVED_FILE)
             .expect("Should save image");
@@ -288,19 +288,19 @@ fn make_ui() {
     but_custom_kernel.set_callback(move |_| {
         let custom_kernel = [
             [
-                fetch_input_val(&kernel_0) as f32,
-                fetch_input_val(&kernel_1) as f32,
-                fetch_input_val(&kernel_2) as f32,
+                fetch_input_val(&kernel_0),
+                fetch_input_val(&kernel_1),
+                fetch_input_val(&kernel_2),
             ],
             [
-                fetch_input_val(&kernel_3) as f32,
-                fetch_input_val(&kernel_4) as f32,
-                fetch_input_val(&kernel_5) as f32,
+                fetch_input_val(&kernel_3),
+                fetch_input_val(&kernel_4),
+                fetch_input_val(&kernel_5),
             ],
             [
-                fetch_input_val(&kernel_6) as f32,
-                fetch_input_val(&kernel_7) as f32,
-                fetch_input_val(&kernel_8) as f32,
+                fetch_input_val(&kernel_6),
+                fetch_input_val(&kernel_7),
+                fetch_input_val(&kernel_8),
             ],
         ];
         apply_kernel_to_image(custom_kernel, false, true);
@@ -356,7 +356,7 @@ fn apply_kernel_to_image(kernel: [[f32; 3]; 3], should_clamp: bool, turn_gray: b
     let image = image::open(SAVED_FILE)
         .expect("Should open image")
         .into_rgb8();
-    image_ops::modname::apply_conv(kernel, &image, should_clamp)
+    image_ops::matrix_ops::apply_conv(kernel, &image, should_clamp)
         .save(SAVED_FILE)
         .expect("Should save image");
     update_frame(image.width(), image.height(), SAVED_FILE);
@@ -375,6 +375,6 @@ fn update_frame(width: u32, height: u32, file_path: &'static str) {
     window.show();
 }
 
-fn fetch_input_val(input: &Input) -> i32 {
+fn fetch_input_val(input: &Input) -> f32 {
     input.value().trim().parse().expect("Should have number!")
 }

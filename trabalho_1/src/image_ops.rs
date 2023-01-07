@@ -108,4 +108,4 @@ pub fn draw_histogram(histogram: &[usize; 256], path: &'static str) {
     .unwrap();
 }
 
-mod matrix_ops;
+pub mod matrix_ops;
