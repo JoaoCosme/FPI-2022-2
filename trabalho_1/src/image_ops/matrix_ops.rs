@@ -20,7 +20,6 @@ pub fn apply_conv(
 
                     let pixel =
                         image.get_pixel((x as i32 + disloc_x) as u32, (y as i32 + disloc_y) as u32);
-                    // dbg!(disloc_y,disloc_x,kernel[i as usize][j as usize],pixel);
 
                     result[0] += pixel[0] as f32 * kernel[i as usize][j as usize];
                     result[1] += pixel[1] as f32 * kernel[i as usize][j as usize];
@@ -47,9 +46,6 @@ pub fn apply_conv(
                 y,
                 Rgb([result[0] as u8, result[1] as u8, result[2] as u8]),
             );
-
-            // dbg!(result);
-            // return  output;
         }
     }
     return output;
