@@ -75,14 +75,15 @@ pub(crate) fn zoom_in(image: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> ImageBuffer<Rgb<
         for y in 0..height {
             let pixel = image.get_pixel(x, y);
             output.put_pixel(x * 2, y * 2, *pixel);
+        }
+    }
 
-            let interpole_x = (x * 2) - if x == 0 { 0 } else { 1 };
-            let interpole_y = (y * 2) - if y == 0 { 0 } else { 1 };
-
+    for x in (1..new_width - 1).step_by(2) {
+        for y in (0..new_height).step_by(2) {
             output.put_pixel(
-                interpole_x,
-                interpole_y,
-                interpole_pixel(pixel, output.get_pixel(x + 1, y)),
+                x,
+                y,
+                interpole_pixel(output.get_pixel(x - 1, y), output.get_pixel(x + 1, y)),
             );
         }
     }
