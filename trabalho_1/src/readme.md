@@ -1,19 +1,19 @@
 # Todo
 
-- [ ] Histograma
+- [x] Histograma
 - [ ] Brilho
-  - [ ] Operação
+  - [x] Operação
   - [ ] Aumentar/Reduzir
 - [ ] Contraste
-  - [ ] Operação
+  - [x] Operação
   - [ ] Aumentar/Reduzir
-- [ ]  Negativo
-- [ ]  Equalização
+- [x]  Negativo
+- [x]  Equalização
 - [ ]  Histogram Matching
   - [ ]  Grey
   - [ ]  Color
 - [ ]  Zoom Out
 - [ ]  Zoom In
-- [ ]  Rotate
-- [ ]  Convolução
+- [x]  Rotate
+- [x]  Convolução
 - [ ]  Relatorio
