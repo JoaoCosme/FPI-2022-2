@@ -1,5 +1,5 @@
 mod image_ops;
-mod kernel;
+mod kernel_repo;
 mod matrix_ops;
 mod test;
 use image::GenericImageView;
@@ -254,31 +254,31 @@ fn make_ui() {
     });
 
     but_gauss.set_callback(move |_| {
-        apply_kernel_to_image(kernel::GAUSS, false, false);
+        apply_kernel_to_image(kernel_repo::GAUSS, false, false);
     });
 
     but_laplacian.set_callback(move |_| {
-        apply_kernel_to_image(kernel::LAPLACIAN, false, true);
+        apply_kernel_to_image(kernel_repo::LAPLACIAN, false, true);
     });
 
     but_passa_alta.set_callback(move |_| {
-        apply_kernel_to_image(kernel::PASSA_ALTA, false, true);
+        apply_kernel_to_image(kernel_repo::PASSA_ALTA, false, true);
     });
 
     but_pw_hx.set_callback(move |_| {
-        apply_kernel_to_image(kernel::PREWITT_HX, true, true);
+        apply_kernel_to_image(kernel_repo::PREWITT_HX, true, true);
     });
 
     but_pw_hy.set_callback(move |_| {
-        apply_kernel_to_image(kernel::PREWITT_HY, true, true);
+        apply_kernel_to_image(kernel_repo::PREWITT_HY, true, true);
     });
 
     but_sobel_hx.set_callback(move |_| {
-        apply_kernel_to_image(kernel::SOBEL_HX, true, true);
+        apply_kernel_to_image(kernel_repo::SOBEL_HX, true, true);
     });
 
     but_sobel_hy.set_callback(move |_| {
-        apply_kernel_to_image(kernel::SOBEL_HY, true, true);
+        apply_kernel_to_image(kernel_repo::SOBEL_HY, true, true);
     });
     but_reset.set_callback(move |_| {
         let img = image::open(COPIED_FILE).expect("Should open image");
@@ -356,7 +356,7 @@ fn apply_kernel_to_image(kernel: [[f32; 3]; 3], should_clamp: bool, turn_gray: b
     let image = image::open(SAVED_FILE)
         .expect("Should open image")
         .into_rgb8();
-    image_ops::apply_conv(kernel, &image, should_clamp)
+    image_ops::modname::apply_conv(kernel, &image, should_clamp)
         .save(SAVED_FILE)
         .expect("Should save image");
     update_frame(image.width(), image.height(), SAVED_FILE);
