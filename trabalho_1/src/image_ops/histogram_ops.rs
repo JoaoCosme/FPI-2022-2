@@ -75,13 +75,16 @@ pub(crate) fn fixed_equalize_image(
 
     for x in 0..width {
         for y in 0..height {
-            let value = image.get_pixel(x, y).to_rgb().0[0];
-            let color = hist_cumulative[value as usize] as u8;
+            let rgb = image.get_pixel(x, y).to_rgb().0;
             output.put_pixel(
                 x,
                 y,
                 Rgb {
-                    0: [color, color, color],
+                    0: [
+                        hist_cumulative[rgb[0] as usize] as u8,
+                        hist_cumulative[rgb[1] as usize] as u8,
+                        hist_cumulative[rgb[2] as usize] as u8,
+                    ],
                 },
             );
         }
