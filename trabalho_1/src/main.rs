@@ -17,6 +17,7 @@ use fltk::{
 
 const SAVED_FILE: &'static str = "./loaded_image.jpeg";
 const COPIED_FILE: &'static str = "./copy.jpeg";
+const MATCHING_FILE: &'static str = "./histogram_match.jpeg";
 const HISTOGRAM: &'static str = "./histogram.jpeg";
 
 fn main() {
@@ -197,6 +198,11 @@ fn make_ui() {
     let mut contrast_val = Input::default()
         .size_of(&but_zoom_out)
         .below_of(&but_contrast, 1);
+
+    let mut but_histogram_matching: Button = Button::default()
+        .with_size(button_width, button_height)
+        .below_of(&but_zoom_out, 5)
+        .with_label("Match histogram");
 
     equalize_val.set_value("0");
     kernel_0.set_value("0");
