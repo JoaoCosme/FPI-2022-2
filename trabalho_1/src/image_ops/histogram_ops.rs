@@ -62,6 +62,34 @@ pub(crate) fn equalize_image(
     return output;
 }
 
+pub(crate) fn fixed_equalize_image(
+    image: &ImageBuffer<Rgb<u8>, Vec<u8>>,
+) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
+    let image_gray = point_ops::make_gray_image(&image);
+    let hist = point_ops::make_histogram(&image_gray);
+    let image = image_gray;
+    let width = image.width();
+    let height = image.height();
+    let mut output: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(width, image.height());
+
+    let hist_cumulative = calculate_cumulative_histogram(&image, hist);
+
+    for x in 0..width {
+        for y in 0..height {
+            let value = image.get_pixel(x, y).to_rgb().0[0];
+            let color = hist_cumulative[value as usize] as u8;
+            output.put_pixel(
+                x,
+                y,
+                Rgb {
+                    0: [color, color, color],
+                },
+            );
+        }
+    }
+    return output;
+}
+
 pub(crate) fn calculate_cumulative_histogram(
     image: &ImageBuffer<Rgb<u8>, Vec<u8>>,
     hist: [usize; COLOR_NUMBER],

@@ -149,6 +149,11 @@ fn make_ui() {
         .below_of(&but_zoom_out, 5)
         .with_label("Match hist.");
 
+    let mut but_equalize_fixed: Button = Button::default()
+        .with_size(button_width, button_height)
+        .right_of(&but_histogram_matching, 5)
+        .with_label("Fixed equalize");
+
     let mut but_gauss = Button::default()
         .with_size(button_width, button_height)
         .below_of(&but_histogram, 5)
@@ -242,6 +247,15 @@ fn make_ui() {
             .into_rgb8();
         let num_of_colors = fetch_input_val(&equalize_val) as i32;
         image_ops::histogram_ops::equalize_image(&img, num_of_colors)
+            .save(SAVED_FILE)
+            .expect("Should save image");
+        update_frame(img.width(), img.height(), SAVED_FILE);
+    });
+    but_equalize_fixed.set_callback(move |_| {
+        let img = image::open(SAVED_FILE)
+            .expect("Should open image")
+            .into_rgb8();
+        image_ops::histogram_ops::fixed_equalize_image(&img)
             .save(SAVED_FILE)
             .expect("Should save image");
         update_frame(img.width(), img.height(), SAVED_FILE);
