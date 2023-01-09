@@ -89,30 +89,34 @@ pub fn match_histogram(
     let mut output: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(width, height);
 
     let base_gray_image = &make_gray_image(&base_image);
-    let base_histogram = make_histogram(&base_gray_image);
-    let base_cumulative_histogram = calculate_cumulative_histogram(base_image, base_histogram);
+    let base_cumulative_histogram = calculate_cumulative_histogram(
+        base_image,
+        make_histogram(&(&make_gray_image(&base_image))),
+    );
 
     let gray_image_to_match = make_gray_image(&image_to_match);
-    let histogram_to_match = make_histogram(&gray_image_to_match);
     let cumulative_histogram_to_match =
-        calculate_cumulative_histogram(image_to_match, histogram_to_match);
+        calculate_cumulative_histogram(image_to_match, make_histogram(&gray_image_to_match));
 
-    let mut HM: [usize; COLOR_NUMBER] = [0; COLOR_NUMBER];
+    let mut matched_histogram: [usize; COLOR_NUMBER] = [0; COLOR_NUMBER];
 
-    for r in 0..=255 {
-        for z in 0..=255 {
-            if base_cumulative_histogram[r] == cumulative_histogram_to_match[z] {
-                HM[r] = z;
+    for shade_in_base in 0..=255 {
+        let base_cumulative_value = base_cumulative_histogram[shade_in_base];
+        for shade_in_target in 0..=255 {
+            let target_cumulative_value = cumulative_histogram_to_match[shade_in_target];
+
+            if base_cumulative_value == target_cumulative_value {
+                matched_histogram[shade_in_base] = shade_in_target;
                 break;
-            } else if base_cumulative_histogram[r] < cumulative_histogram_to_match[z] {
-                if z == 0 {
-                    HM[r] = 0;
-                } else if z as f32 - base_cumulative_histogram[r]
-                    <= base_cumulative_histogram[r] - (z - 1) as f32
+            } else if base_cumulative_value < target_cumulative_value {
+                if shade_in_target == 0 {
+                    matched_histogram[shade_in_base] = 0;
+                } else if shade_in_target as f32 - base_cumulative_value
+                    <= base_cumulative_value - (shade_in_target - 1) as f32
                 {
-                    HM[r] = z;
+                    matched_histogram[shade_in_base] = shade_in_target;
                 } else {
-                    HM[r] = z - 1;
+                    matched_histogram[shade_in_base] = shade_in_target - 1;
                 }
                 break;
             }
@@ -122,7 +126,7 @@ pub fn match_histogram(
     for x in 0..width {
         for y in 0..height {
             let value = base_gray_image.get_pixel(x, y).to_rgb().0[0];
-            let color = HM[value as usize] as u8;
+            let color = matched_histogram[value as usize] as u8;
             output.put_pixel(
                 x,
                 y,
