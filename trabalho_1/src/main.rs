@@ -1,7 +1,5 @@
 mod image_ops;
 mod kernel_repo;
-mod matrix_ops;
-mod test;
 use image::GenericImageView;
 pub const COLOR_NUMBER: usize = 256;
 use fltk::{
@@ -18,7 +16,6 @@ use image_ops::histogram_ops::match_histogram;
 
 const SAVED_FILE: &'static str = "./loaded_image.jpeg";
 const COPIED_FILE: &'static str = "./copy.jpeg";
-const MATCHING_FILE: &'static str = "./histogram_match.jpeg";
 const HISTOGRAM: &'static str = "./histogram.jpeg";
 
 fn main() {
@@ -61,8 +58,8 @@ fn make_ui() {
     let height = height as i32;
     let app = app::App::default();
     let mut window = Window::new(0, 0, window_width, window_height + 50, "Base Image");
-    let mut frame = Frame::new(20, 10, width, height, "");
     let mut image = SharedImage::load(SAVED_FILE).unwrap();
+    let mut frame = Frame::new((window_width - image.width()) / 2, 10, width, height, "");
     image.scale(width, height, true, true);
     frame.set_image(Some(image));
 
@@ -71,47 +68,90 @@ fn make_ui() {
 
     let mut but_equalize = Button::default()
         .with_size(button_width, button_height)
-        .below_of(&frame, 0)
+        .with_pos(10, img.height() as i32 + 15)
         .with_label("Equalize");
-    let mut but_horizontal = Button::default()
-        .size_of(&but_equalize)
-        .right_of(&but_equalize, 5)
-        .with_label("Flip Horizontal");
-    let mut but_vertical = Button::default()
-        .size_of(&but_equalize)
-        .right_of(&but_horizontal, 5)
-        .with_label("Flip Vertical");
-    let mut but_gray = Button::default()
-        .size_of(&but_equalize)
-        .right_of(&but_vertical, 5)
-        .with_label("Gray Scale");
-    let mut save_result = Button::default()
-        .size_of(&but_equalize)
-        .right_of(&but_gray, 5)
-        .with_label("Save Result");
+
     let mut equalize_val = Input::default()
         .size_of(&but_equalize)
         .below_of(&but_equalize, 1);
     let mut but_bright = Button::default()
         .with_size(button_width, button_height)
-        .below_of(&but_horizontal, 0)
+        .right_of(&but_equalize, 0)
         .with_label("Bright Up");
     let mut but_contrast = Button::default()
         .with_size(button_width, button_height)
         .right_of(&but_bright, 5)
         .with_label("Contrast Up");
+
     let mut but_negative = Button::default()
         .with_size(button_width, button_height)
         .right_of(&but_contrast, 5)
         .with_label("Negative");
+    let mut but_save_result = Button::default()
+        .size_of(&but_negative)
+        .right_of(&but_negative, 5)
+        .with_label("Save Result");
+    let mut but_gray = Button::default()
+        .size_of(&but_equalize)
+        .below_of(&but_negative, 5)
+        .with_label("Gray Scale");
+
+    let mut but_reset: Button = Button::default()
+        .with_size(button_width, button_height)
+        .below_of(&but_save_result, 5)
+        .with_label("Reset");
+
+    let mut but_horizontal = Button::default()
+        .size_of(&but_equalize)
+        .below_of(&equalize_val, 5)
+        .with_label("Flip Horizontal");
+    let mut but_vertical = Button::default()
+        .size_of(&but_equalize)
+        .right_of(&but_horizontal, 5)
+        .with_label("Flip Vertical");
+
+    let mut but_rotate_left: Button = Button::default()
+        .with_size(button_width, button_height)
+        .right_of(&but_vertical, 5)
+        .with_label("Rotate Left");
+    let mut but_rotate_right: Button = Button::default()
+        .with_size(button_width, button_height)
+        .right_of(&but_rotate_left, 5)
+        .with_label("Rotate Right");
+
+    let mut but_zoom_in: Button = Button::default()
+        .with_size(button_width, button_height)
+        .below_of(&but_horizontal, 5)
+        .with_label("Zoom in");
+    let mut but_zoom_out: Button = Button::default()
+        .with_size(button_width, button_height)
+        .right_of(&but_zoom_in, 5)
+        .with_label("Zoom out");
+
     let mut but_histogram = Button::default()
         .with_size(button_width, button_height)
-        .right_of(&but_negative, 5)
+        .below_of(&but_zoom_in, 5)
         .with_label("Histogram");
+
+    let mut out_sx = Input::default()
+        .size_of(&but_zoom_out)
+        .right_of(&but_zoom_out, 1);
+    let mut out_sy = Input::default().size_of(&out_sx).right_of(&out_sx, 1);
+    let mut bright_val = Input::default()
+        .size_of(&but_zoom_out)
+        .below_of(&but_bright, 1);
+    let mut contrast_val = Input::default()
+        .size_of(&but_zoom_out)
+        .below_of(&but_contrast, 1);
+
+    let mut but_histogram_matching: Button = Button::default()
+        .with_size(button_width, button_height)
+        .below_of(&but_zoom_out, 5)
+        .with_label("Match hist.");
 
     let mut but_gauss = Button::default()
         .with_size(button_width, button_height)
-        .below_of(&equalize_val, button_height)
+        .below_of(&but_histogram, 5)
         .with_label("Gaussian");
     let mut but_passa_alta = Button::default()
         .with_size(button_width, button_height)
@@ -171,45 +211,6 @@ fn make_ui() {
         .right_of(&kernel_8, 1)
         .with_label("Custom Kernel");
 
-    let mut but_reset: Button = Button::default()
-        .with_size(button_width, button_height)
-        .right_of(&but_sobel_hy, 5)
-        .with_label("Reset");
-
-    let mut but_rotate_left: Button = Button::default()
-        .with_size(button_width, button_height)
-        .below_of(&kernel_6, 5)
-        .with_label("Rotate Left");
-    let mut but_rotate_right: Button = Button::default()
-        .with_size(button_width, button_height)
-        .right_of(&but_rotate_left, 5)
-        .with_label("Rotate Right");
-
-    let mut but_zoom_in: Button = Button::default()
-        .with_size(button_width, button_height)
-        .right_of(&but_rotate_right, 5)
-        .with_label("Zoom in");
-
-    let mut but_zoom_out: Button = Button::default()
-        .with_size(button_width, button_height)
-        .below_of(&but_rotate_left, 5)
-        .with_label("Zoom out");
-    let mut out_sx = Input::default()
-        .size_of(&but_zoom_out)
-        .right_of(&but_zoom_out, 1);
-    let mut out_sy = Input::default().size_of(&out_sx).right_of(&out_sx, 1);
-    let mut bright_val = Input::default()
-        .size_of(&but_zoom_out)
-        .below_of(&but_bright, 1);
-    let mut contrast_val = Input::default()
-        .size_of(&but_zoom_out)
-        .below_of(&but_contrast, 1);
-
-    let mut but_histogram_matching: Button = Button::default()
-        .with_size(button_width, button_height)
-        .below_of(&but_zoom_out, 5)
-        .with_label("Match histogram");
-
     equalize_val.set_value("0");
     kernel_0.set_value("0");
     kernel_1.set_value("0");
@@ -245,7 +246,7 @@ fn make_ui() {
             .expect("Should save image");
         update_frame(img.width(), img.height(), SAVED_FILE);
     });
-    save_result.set_callback(move |_| {
+    but_save_result.set_callback(move |_| {
         let img = image::open(SAVED_FILE).expect("Should open image");
         let mut save = FileDialog::new(dialog::FileDialogType::BrowseSaveFile);
 
@@ -413,7 +414,7 @@ fn calc_window_height(height: u32) -> i32 {
 }
 
 fn calc_window_width(width: u32) -> i32 {
-    (width + 100).max(700) as i32
+    (width + 100).max(400) as i32
 }
 
 fn turn_image_to_grayscale() -> image::ImageBuffer<image::Rgb<u8>, Vec<u8>> {
