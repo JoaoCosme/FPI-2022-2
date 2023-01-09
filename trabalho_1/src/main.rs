@@ -14,6 +14,7 @@ use fltk::{
     prelude::*,
     window::Window,
 };
+use image_ops::match_histogram;
 
 const SAVED_FILE: &'static str = "./loaded_image.jpeg";
 const COPIED_FILE: &'static str = "./copy.jpeg";
@@ -25,6 +26,18 @@ fn main() {
 }
 
 fn pick_file() {
+    let mut file_chooser = fetch_file();
+    let dynamic_image = image::open(file_chooser.value(0).expect("Should have choosen file"))
+        .expect("Should open image");
+    dynamic_image
+        .save(SAVED_FILE)
+        .expect("Should save opened image");
+    dynamic_image
+        .save(COPIED_FILE)
+        .expect("Should save opened image");
+}
+
+fn fetch_file() -> FileChooser {
     let mut file_chooser = FileChooser::new(
         ".",
         "*.{jpeg,jpg}",
@@ -35,14 +48,7 @@ fn pick_file() {
     while file_chooser.shown() {
         app::wait();
     }
-    let dynamic_image = image::open(file_chooser.value(0).expect("Should have choosen file"))
-        .expect("Should open image");
-    dynamic_image
-        .save(SAVED_FILE)
-        .expect("Should save opened image");
-    dynamic_image
-        .save(COPIED_FILE)
-        .expect("Should save opened image");
+    file_chooser
 }
 
 fn make_ui() {
@@ -362,6 +368,20 @@ fn make_ui() {
             .save(SAVED_FILE)
             .expect("Should save image");
         update_frame(img.width(), img.height(), SAVED_FILE);
+    });
+
+    but_histogram_matching.set_callback(|_| {
+        let mut file_chooser = fetch_file();
+        let image_to_match = image::open(file_chooser.value(0).expect("Should have choosen file"))
+            .expect("Should open image")
+            .into_rgb8();
+        let base_image = image::open(SAVED_FILE)
+            .expect("Should open image")
+            .into_rgb8();
+        match_histogram(&base_image, &image_to_match)
+            .save(SAVED_FILE)
+            .expect("Should save image");
+        update_frame(base_image.width(), base_image.height(), SAVED_FILE);
     });
 
     window.make_resizable(false);

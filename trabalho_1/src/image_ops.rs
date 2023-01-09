@@ -108,3 +108,13 @@ pub fn draw_histogram(histogram: &[usize; 256], path: &'static str) {
     }))
     .unwrap();
 }
+
+pub fn match_histogram(
+    base_image: &ImageBuffer<Rgb<u8>, Vec<u8>>,
+    image_to_match: &ImageBuffer<Rgb<u8>, Vec<u8>>,
+) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
+    let width = base_image.width();
+    let height = base_image.height();
+    let mut output: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(width, height);
+    output
+}
