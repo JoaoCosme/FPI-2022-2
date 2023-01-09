@@ -65,9 +65,8 @@ pub(crate) fn equalize_image(
 pub(crate) fn fixed_equalize_image(
     image: &ImageBuffer<Rgb<u8>, Vec<u8>>,
 ) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
-    let image_gray = point_ops::make_gray_image(&image);
-    let hist = point_ops::make_histogram(&image_gray);
-    let image = image_gray;
+    let hist = point_ops::make_histogram(&make_gray_image(image));
+    let image = image;
     let width = image.width();
     let height = image.height();
     let mut output: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(width, image.height());

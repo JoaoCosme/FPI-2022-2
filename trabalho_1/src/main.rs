@@ -275,7 +275,9 @@ fn make_ui() {
         let img = image::open(SAVED_FILE)
             .expect("Should open image")
             .into_rgb8();
-        image_ops::apply_point_operation(&img, 1.0, fetch_input_val(&bright_val))
+        let mut b = fetch_input_val(&bright_val);
+        normalize_bias(&mut b);
+        image_ops::apply_point_operation(&img, 1.0, b)
             .save(SAVED_FILE)
             .expect("Should save image");
         update_frame(img.width(), img.height(), SAVED_FILE);
@@ -284,7 +286,9 @@ fn make_ui() {
         let img = image::open(SAVED_FILE)
             .expect("Should open image")
             .into_rgb8();
-        image_ops::apply_point_operation(&img, fetch_input_val(&contrast_val), 0.0)
+        let mut a = fetch_input_val(&contrast_val);
+        normalize_gain(&mut a);
+        image_ops::apply_point_operation(&img, a, 0.0)
             .save(SAVED_FILE)
             .expect("Should save image");
         update_frame(img.width(), img.height(), SAVED_FILE);
@@ -406,9 +410,30 @@ fn make_ui() {
         update_frame(image_to_match.width(), image_to_match.height(), &path);
     });
 
-    // window.make_resizable(false);
     window.show();
     app.run().ok();
+}
+
+fn normalize_gain(a: &mut f32) {
+    *a = if *a <= 0.0 {
+        0.1
+    } else {
+        if *a > 255.0 {
+            255.0
+        } else {
+            *a
+        }
+    };
+}
+
+fn normalize_bias(b: &mut f32) {
+    *b = if *b > 255.0 {
+        255.0
+    } else if *b < -255.0 {
+        -255.0
+    } else {
+        *b
+    };
 }
 
 fn apply_function_to_image(
