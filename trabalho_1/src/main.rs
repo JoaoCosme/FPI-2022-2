@@ -3,7 +3,7 @@ mod kernel_repo;
 mod matrix_ops;
 mod test;
 use image::GenericImageView;
-const COLOR_NUMBER: usize = 256;
+pub const COLOR_NUMBER: usize = 256;
 use fltk::{
     app,
     button::Button,
@@ -14,7 +14,7 @@ use fltk::{
     prelude::*,
     window::Window,
 };
-use image_ops::match_histogram;
+use image_ops::histogram_ops::match_histogram;
 
 const SAVED_FILE: &'static str = "./loaded_image.jpeg";
 const COPIED_FILE: &'static str = "./copy.jpeg";
@@ -240,7 +240,7 @@ fn make_ui() {
             .expect("Should open image")
             .into_rgb8();
         let num_of_colors = fetch_input_val(&equalize_val) as i32;
-        image_ops::equalize_image(&img, num_of_colors)
+        image_ops::histogram_ops::equalize_image(&img, num_of_colors)
             .save(SAVED_FILE)
             .expect("Should save image");
         update_frame(img.width(), img.height(), SAVED_FILE);
@@ -288,7 +288,7 @@ fn make_ui() {
         let img = image::open(SAVED_FILE)
             .expect("Should open image")
             .into_rgb8();
-        image_ops::draw_histogram(
+        image_ops::histogram_ops::draw_histogram(
             &image_ops::point_ops::make_histogram(&image_ops::point_ops::make_gray_image(&img)),
             HISTOGRAM,
         );
