@@ -372,9 +372,15 @@ fn make_ui() {
 
     but_histogram_matching.set_callback(|_| {
         let mut file_chooser = fetch_file();
-        let image_to_match = image::open(file_chooser.value(0).expect("Should have choosen file"))
-            .expect("Should open image")
-            .into_rgb8();
+        let path = file_chooser.value(0).expect("Should have choosen file");
+        let image_to_match = image::open(
+            file_chooser
+                .value(0)
+                .expect("Should have choosen file")
+                .clone(),
+        )
+        .expect("Should open image")
+        .into_rgb8();
         let base_image = image::open(SAVED_FILE)
             .expect("Should open image")
             .into_rgb8();
@@ -382,9 +388,10 @@ fn make_ui() {
             .save(SAVED_FILE)
             .expect("Should save image");
         update_frame(base_image.width(), base_image.height(), SAVED_FILE);
+        update_frame(image_to_match.width(), image_to_match.height(), &path);
     });
 
-    window.make_resizable(false);
+    // window.make_resizable(false);
     window.show();
     app.run().ok();
 }
@@ -432,7 +439,7 @@ fn apply_kernel_to_image(kernel: [[f32; 3]; 3], should_clamp: bool, turn_gray: b
     update_frame(image.width(), image.height(), SAVED_FILE);
 }
 
-fn update_frame(width: u32, height: u32, file_path: &'static str) {
+fn update_frame(width: u32, height: u32, file_path: &str) {
     let window_width = calc_window_width(width);
     let window_height = calc_window_height(height);
     let width = width as i32;

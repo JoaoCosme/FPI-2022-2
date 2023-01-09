@@ -88,8 +88,50 @@ pub fn match_histogram(
     let height = base_image.height();
     let mut output: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(width, height);
 
-    let base_histogram = make_histogram(&make_gray_image(&base_image));
-    let histogram_to_match = make_histogram(&make_gray_image(&image_to_match));
+    let base_gray_image = &make_gray_image(&base_image);
+    let base_histogram = make_histogram(&base_gray_image);
+    let base_cumulative_histogram = calculate_cumulative_histogram(base_image, base_histogram);
+
+    let gray_image_to_match = make_gray_image(&image_to_match);
+    let histogram_to_match = make_histogram(&gray_image_to_match);
+    let cumulative_histogram_to_match =
+        calculate_cumulative_histogram(image_to_match, histogram_to_match);
+
+    let mut HM: [usize; COLOR_NUMBER] = [0; COLOR_NUMBER];
+
+    for r in 0..=255 {
+        for z in 0..=255 {
+            if base_cumulative_histogram[r] == cumulative_histogram_to_match[z] {
+                HM[r] = z;
+                break;
+            } else if base_cumulative_histogram[r] < cumulative_histogram_to_match[z] {
+                if z == 0 {
+                    HM[r] = 0;
+                } else if z as f32 - base_cumulative_histogram[r]
+                    <= base_cumulative_histogram[r] - (z - 1) as f32
+                {
+                    HM[r] = z;
+                } else {
+                    HM[r] = z - 1;
+                }
+                break;
+            }
+        }
+    }
+
+    for x in 0..width {
+        for y in 0..height {
+            let value = base_gray_image.get_pixel(x, y).to_rgb().0[0];
+            let color = HM[value as usize] as u8;
+            output.put_pixel(
+                x,
+                y,
+                Rgb {
+                    0: [color, color, color],
+                },
+            )
+        }
+    }
 
     output
 }
