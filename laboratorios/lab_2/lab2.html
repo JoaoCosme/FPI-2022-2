@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>lab2.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="fundamentos-de-processamento-de-imagens">Fundamentos de Processamento de Imagens</h1>
+<h2 id="relat%C3%B3rio-ilustrado-%E2%80%93-laborat%C3%B3rio-2">Relatório Ilustrado – Laboratório 2</h2>
+<p>Nome: João Pedro Cosme da Silva / Cartão 0031472</p>
+<h3 id="quest%C3%A3o-2">Questão 2</h3>
+<p>Para exibir as partes reais e imaginarias de um número complexo, gerado pela transformada rápida de Fourier, podemos utilizar os seguintes comandos:</p>
+<pre class="hljs"><code><div>cman_ft = fft2(cman);
+
+cman_real = <span class="hljs-built_in">real</span>(cman_ft);
+cman_imag = <span class="hljs-built_in">imag</span>(cman_ft);
+
+subplot(<span class="hljs-number">3</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>);
+imshow(uint8(cman_real));
+title(<span class="hljs-string">"Real part"</span>);
+
+subplot(<span class="hljs-number">3</span>,<span class="hljs-number">2</span>,<span class="hljs-number">4</span>);
+imshow(uint8(cman_imag));
+title(<span class="hljs-string">"Image part"</span>);
+</div></code></pre>
+<p>Podendo obter os resultados conforme visto nas imagens <code>Real Part</code> e <code>Image Part</code> abaixo:</p>
+<p><img src="q2.jpg" alt="q2"></p>
+<p align = "center">
+Imagem 1: Questões 2 a 4
+</p>
+<p>Quando aplicamos a transformada de Fourier em uma imagem, ela é transformada do dominio espacial para o dominio frequencia, representados por numeros complexos. Conforme visto, qualquer sinal pode ser representado por uma soma de senos e cossenos de diferentes magnitudes. A parte real da imagem, representa os coeficientes $\frac {au} 2 $ (referentes aos cossenos utilizados para reconstruir o sinal). Já a parte imaginaria representa os coeficientes $\frac {bu} 2 $ (referentes aos cossenos utilizados para reconstruir o sinal).</p>
+<p>Porém, como visualizamos estes números através de sua conversão para inteiros de 8 bits, a imagem se torna apenas ruído que não nos diz muito diretamente.</p>
+<h3 id="quest%C3%A3o-3">Questão 3</h3>
+<p>O espectro de amplitude recuperado pelo comando <code>imshow(log(abs(cman_ft)),[3 10]</code> pode ser visto na Imagem 1 acima.</p>
+<p>Este espectro, mostrado em questões de valores absolutos e normalizados utilizando a função $log$, representa o quanto cada frequência impacta na imagem final.</p>
+<h3 id="quest%C3%A3o-4">Questão 4</h3>
+<p>Ao aplicarmos a função <code>fft2</code>, levamos uma imagem do domínio frequência para o domínio espacial. Como essa transformação preserva os coeficientes de suas componentes de seno e cossenos, se supõe que ao aplicarmos a inversa da transformada de Fourier seriamos capazes de recuperar a imagem original <strong>sem distorções</strong>.</p>
+<p>Conforme visto na imagem um, sob o titulo de <code>Inverse FT</code>, podemos validar que ao aplicarmos o comando <code>ifft2</code> este é sim o caso e que a transformada de Fourier funciona corretamente para a transformação entre os dois domínios.</p>
+<h3 id="quest%C3%A3o-5">Questão 5</h3>
+<p>Para recuperarmos separadamente as componentes reais (com a parte imaginaria zerada), e a parte imaginaria (com a parte real zerada), devemos executar as duas primeiras linhas de código a seguir. Multiplicamos a parte imaginária por $i$, ainda, pois a função <code>imag</code> retorna um numero real, e desejamos um numero complexo.</p>
+<pre class="hljs"><code><div>cman_recon_from_real = ifft2(<span class="hljs-built_in">real</span>(cman_ft));
+cman_recon_from_imag = ifft2(<span class="hljs-built_in">imag</span>(cman_ft)*<span class="hljs-built_in">i</span>);
+
+<span class="hljs-built_in">figure</span>();
+subplot(<span class="hljs-number">2</span>,<span class="hljs-number">2</span>,<span class="hljs-number">1</span>);
+imshow(uint8(cman_recon_from_real));
+title(<span class="hljs-string">"Rec from Real Part"</span>);
+
+subplot(<span class="hljs-number">2</span>,<span class="hljs-number">2</span>,<span class="hljs-number">2</span>);
+imshow(uint8(cman_recon_from_imag));
+title(<span class="hljs-string">"Rec from Imag Part"</span>);
+</div></code></pre>
+<p>O resultado obtido pode ser visto na imagem 2 abaixo, nas figuras <code>Rec From Real Part</code> e <code>Rec from Imag Part</code></p>
+<p><img src="q5.jpg" alt="q5"></p>
+<p align = "center">
+Imagem 2: Questões 5 e 6
+</p>
+<p>Podemos notar que as imagens apresentam um efeito de <em>espelhamento</em> . Isso se dá pois, para cada imagem, recuperamos apenas a parte dos senos ou cossenos vezes seus respectivos componentes. Dessa forma, nenhuma delas apresenta a imagem completa. Esse espelhamento também ocorre, pois, como representamos a imagem de forma periódica.</p>
+<p>Ainda, a imagem reconstruída a partir da parte imaginaria se mostra mais escura, pois apresenta diversos valores negativos que são representados como zero.</p>
+<p>REVER ESTA PARTE DO VIDEO</p>
+<h3 id="quest%C3%A3o-6">Questão 6</h3>
+<p>Somandos as componentes reais e imaginarias obtidas separadamente abaixo, podemos soma-las e ainda sim produzir a imagem original. Isto se dá pois, mesmo recompondo separadamente a porção real e a porção imaginaria dos numeros gerados pela transformada de Fourier, os valores no dominio frequencia já haviam sido decompostos dessa forma e mesmo anulando determinadas frequencias em cada recomposição, podemos uni-las novamente e obter o resultado original.</p>
+<p>Usando o seguinte código, podemos obter exatamente esse resultado, conforme visto na figure <code>Rec from Sum of Parts</code> da imagem dois:</p>
+<pre class="hljs"><code><div>subplot(<span class="hljs-number">2</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>);
+cman_sum = cman_recon_from_imag + cman_recon_from_real;
+imshow(uint8(cman_sum));
+title(<span class="hljs-string">"Rec from Sum of Parts"</span>);
+</div></code></pre>
+<h3 id="quest%C3%A3o-7">Questão 7</h3>
+<p>Ao aplicarmos o comando <code>fftshift</code>, sobre o resultado da transformada de Fourier, podemos exibir seu resultado utilizando o seguinte código:</p>
+<pre class="hljs"><code><div><span class="hljs-built_in">figure</span>();
+subplot(<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">1</span>);
+cman_ft_shift = fftshift(cman_ft);
+imshow(<span class="hljs-built_in">log</span>(<span class="hljs-built_in">abs</span>(cman_ft_shift)),[<span class="hljs-number">3</span> <span class="hljs-number">10</span>]);
+title(<span class="hljs-string">"Shifted spectre"</span>)
+</div></code></pre>
+<p>Na Imagem 3 abaixo, na figura <code>Shifter Spectre</code>, podemos ver o espectro de amplitude com as frequências menores, que antes se concentravam nas extremidades do espectro original, centralizados no centro da imagem. Dessa forma, conforme nos aproximamos das bordas podemos encontrar frequencias mais altas</p>
+<p><img src="q7.jpg" alt="q7"></p>
+<p align = "center">
+Imagem 3: Questões 7 e 8
+</p>
+<h3 id="quest%C3%A3o-8">Questão 8</h3>
+<p>Conforme visto na imagem Q7 acima, temos uma imagem mais escura que a original, porém, isso se dá ao detalhe visto no zoom abaixo, na Imagem 4:</p>
+<p><img src="2023-01-22-11-32-37.png" alt="q8"></p>
+<p align = "center">
+Imagem 4: Zoom na inversa da imagem com shift
+</p>
+<p>Isto se dá devido ao shift que realizamos sobre o domínio frequência da imagem, faz com que quando realizamos a transformada inversa, indices alternados são transformados em valores negativos devido ao shift. Dessa forma, mostramos alguns pixeis como pretos, pois esta é a forma que o comando <code>imshow</code> exibe valores negativos.</p>
+<h3 id="quest%C3%A3o-9">Questão 9</h3>
+<p>Para desfazermos o shift e reconstruirmos a imagem original, podemos utilizar dois métodos: o mais simples, que é utilizando o comando <code>ifftshit</code> que já executa a inversa de um shift no dominio de frequencia de uma imagem, ou executando um novo shift, que devido a propriedade comutativa da transformada de Fourier nos traz novamente para a imagem original.</p>
+<p><img src="q9.jpg" alt="q9"></p>
+<p align = "center">
+Imagem 5: Questão 9
+</p>
+<p>O código utilizado para produzir estes resultados é o seguinte:</p>
+<pre class="hljs"><code><div><span class="hljs-comment">% Q9 - Inverse Shift</span>
+<span class="hljs-built_in">figure</span>()
+subplot(<span class="hljs-number">2</span>,<span class="hljs-number">2</span>,<span class="hljs-number">1</span>);
+cman_ft_unshift = ifftshift(cman_ft_shift);
+imshow(<span class="hljs-built_in">log</span>(<span class="hljs-built_in">abs</span>(cman_ft_unshift)),[<span class="hljs-number">3</span> <span class="hljs-number">10</span>]);
+title(<span class="hljs-string">"Unshifted spectre"</span>)
+
+cman_ft_unshift = ifft2(cman_ft_unshift);
+
+subplot(<span class="hljs-number">2</span>,<span class="hljs-number">2</span>,<span class="hljs-number">2</span>);
+imshow(uint8(cman_ft_unshift));
+title(<span class="hljs-string">"Unshifted Image"</span>);
+
+
+<span class="hljs-comment">% Q9 - Two Shifts</span>
+subplot(<span class="hljs-number">2</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>);
+cman_ft_shifted_twice = fftshift(cman_ft_shift);
+imshow(<span class="hljs-built_in">log</span>(<span class="hljs-built_in">abs</span>(cman_ft_shifted_twice)),[<span class="hljs-number">3</span> <span class="hljs-number">10</span>]);
+title(<span class="hljs-string">"Shifted spectre twice"</span>);
+
+cman_ft_shifted_twice = ifft2(cman_ft_shifted_twice);
+subplot(<span class="hljs-number">2</span>,<span class="hljs-number">2</span>,<span class="hljs-number">4</span>);
+imshow(uint8(cman_ft_shifted_twice));
+title(<span class="hljs-string">"Shifted Twice Image"</span>);
+
+</div></code></pre>
+<h3 id="quest%C3%A3o-10">Questão 10</h3>
+<p>Para recuperarmos a imagem original, podemos utilizar o seguinte código:</p>
+<pre class="hljs"><code><div><span class="hljs-comment">% Q10 - Recover original image</span>
+<span class="hljs-built_in">figure</span>()
+inverse_shifted = ifftshift(fft2(inverse_shifted));
+imshow(uint8(ifft2(inverse_shifted));
+title(<span class="hljs-string">"Q10 Recon"</span>);
+
+</div></code></pre>
+<p>Neste caso, levamos a imagem novamente para o dominio espacial, realizamos a inversa do shift e novamente aplicamos a inversa da transformada Fourier para obtermos a imagem original novamente. O resultado obtido pode ser verificado na Imagem 6.</p>
+<p><img src="q10.jpg" alt="q10"></p>
+<p align = "center">
+Imagem 6: Questão 10
+</p>
+
+</body>
+</html>
