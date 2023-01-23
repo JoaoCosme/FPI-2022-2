@@ -1,5 +1,7 @@
 use opencv::{
-    core::{add_weighted, convert_scale_abs, Size_, BORDER_DEFAULT, CV_16S},
+    core::{
+        add_weighted, convert_scale_abs, Size_, BORDER_DEFAULT, CV_16S, CV_8U, ROTATE_90_CLOCKWISE,
+    },
     highgui::{self, ButtonCallback, QtButtonTypes, QT_PUSH_BUTTON},
     imgproc::{canny, cvt_color, gaussian_blur, sobel, COLOR_BGR2GRAY},
     prelude::*,
@@ -32,10 +34,22 @@ fn main() -> Result<()> {
 
         // apply_gaussian(&frame, &mut frame_out, kernel_size)?;
         // apply_canny(&frame, &mut frame_out)?;
+        // apply_sobel(&frame, &mut frame_out)?;
+        // apply_negative(&frame, &mut frame_out)?;
+        // let add_bright = 10.0;
+        // apply_bright_up(&frame, &mut frame_out, add_bright)?;
 
-        apply_sobel(&frame, &mut frame_out)?;
+        // let apply_contrast = 2.0;
+        // frame.convert_to(&mut frame_out, CV_8U, apply_contrast, 0.0)?;
+
+        // apply_conversion_to_gray(&frame, &mut frame_out)?;
+
+        // apply_rotation(&frame, &mut frame_out)?;
+
+        opencv::core::flip(&frame, &mut frame_out, 1)?;
 
         highgui::imshow("window", &frame_out)?;
+        highgui::imshow("original", &frame)?;
 
         let key = highgui::wait_key(1)?;
         if key == 113 || key == 27 {
@@ -44,6 +58,26 @@ fn main() -> Result<()> {
     }
 
     cam.release()?;
+    Ok(())
+}
+
+fn apply_rotation(frame: &Mat, frame_out: &mut Mat) -> Result<(), opencv::Error> {
+    opencv::core::rotate(frame, frame_out, ROTATE_90_CLOCKWISE)?;
+    Ok(())
+}
+
+fn apply_conversion_to_gray(frame: &Mat, frame_out: &mut Mat) -> Result<(), opencv::Error> {
+    cvt_color(frame, frame_out, COLOR_BGR2GRAY, 0)?;
+    Ok(())
+}
+
+fn apply_bright_up(frame: &Mat, frame_out: &mut Mat, add_bright: f64) -> Result<(), opencv::Error> {
+    frame.convert_to(frame_out, CV_8U, 1.0, add_bright)?;
+    Ok(())
+}
+
+fn apply_negative(frame: &Mat, frame_out: &mut Mat) -> Result<(), opencv::Error> {
+    frame.convert_to(frame_out, CV_8U, -1.0, 255.0)?;
     Ok(())
 }
 
