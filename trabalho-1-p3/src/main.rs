@@ -54,7 +54,9 @@ fn apply_sobel(frame: &Mat, frame_out: &mut Mat) -> Result<(), opencv::Error> {
     let mut abs_grad_y = Mat::default();
     let mut gray_image = Mat::default();
 
-    cvt_color(frame, &mut gray_image, COLOR_BGR2GRAY, 0)?;
+    pre_processing_gaussian(frame, frame_out)?;
+
+    cvt_color(frame_out, &mut gray_image, COLOR_BGR2GRAY, 0)?;
 
     sobel(
         &gray_image,
@@ -88,6 +90,12 @@ fn apply_sobel(frame: &Mat, frame_out: &mut Mat) -> Result<(), opencv::Error> {
 }
 
 fn apply_canny(frame: &Mat, frame_out: &mut Mat) -> Result<(), opencv::Error> {
+    pre_processing_gaussian(frame, frame_out)?;
+    canny(&frame_out.clone(), frame_out, 40.0, 100.0, 3, false)?;
+    Ok(())
+}
+
+fn pre_processing_gaussian(frame: &Mat, frame_out: &mut Mat) -> Result<(), opencv::Error> {
     gaussian_blur(
         frame,
         frame_out,
@@ -99,7 +107,6 @@ fn apply_canny(frame: &Mat, frame_out: &mut Mat) -> Result<(), opencv::Error> {
         0.0,
         0,
     )?;
-    canny(&frame_out.clone(), frame_out, 40.0, 100.0, 3, false)?;
     Ok(())
 }
 
