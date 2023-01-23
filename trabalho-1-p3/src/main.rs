@@ -3,7 +3,7 @@ use opencv::{
         add_weighted, convert_scale_abs, Size_, BORDER_DEFAULT, CV_16S, CV_8U, ROTATE_90_CLOCKWISE,
     },
     highgui::{self, ButtonCallback, QtButtonTypes, QT_PUSH_BUTTON},
-    imgproc::{canny, cvt_color, gaussian_blur, sobel, COLOR_BGR2GRAY},
+    imgproc::{canny, cvt_color, gaussian_blur, sobel, COLOR_BGR2GRAY, INTER_AREA},
     prelude::*,
     videoio, Result,
 };
@@ -46,7 +46,16 @@ fn main() -> Result<()> {
 
         // apply_rotation(&frame, &mut frame_out)?;
 
-        opencv::core::flip(&frame, &mut frame_out, 1)?;
+        // apply_mirror(&frame, &mut frame_out)?;
+
+        opencv::imgproc::resize(
+            &frame,
+            &mut frame_out,
+            Size_::new(0, 0),
+            0.5,
+            0.5,
+            INTER_AREA,
+        )?;
 
         highgui::imshow("window", &frame_out)?;
         highgui::imshow("original", &frame)?;
@@ -58,6 +67,11 @@ fn main() -> Result<()> {
     }
 
     cam.release()?;
+    Ok(())
+}
+
+fn apply_mirror(frame: &Mat, frame_out: &mut Mat) -> Result<(), opencv::Error> {
+    opencv::core::flip(frame, frame_out, 1)?;
     Ok(())
 }
 
