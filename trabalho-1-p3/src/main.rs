@@ -1,7 +1,7 @@
 use opencv::{
-    core::Size_,
+    core::{add_weighted, convert_scale_abs, Size_, BORDER_DEFAULT, CV_16S},
     highgui::{self, ButtonCallback, QtButtonTypes, QT_PUSH_BUTTON},
-    imgproc::{canny, gaussian_blur},
+    imgproc::{canny, cvt_color, gaussian_blur, sobel, COLOR_BGR2GRAY},
     prelude::*,
     videoio, Result,
 };
@@ -31,8 +31,9 @@ fn main() -> Result<()> {
         let mut frame_out = Mat::default();
 
         // apply_gaussian(&frame, &mut frame_out, kernel_size)?;
+        // apply_canny(&frame, &mut frame_out)?;
 
-        apply_canny(&frame, &mut frame_out)?;
+        apply_sobel(&frame, &mut frame_out)?;
 
         highgui::imshow("window", &frame_out)?;
 
@@ -43,6 +44,46 @@ fn main() -> Result<()> {
     }
 
     cam.release()?;
+    Ok(())
+}
+
+fn apply_sobel(frame: &Mat, frame_out: &mut Mat) -> Result<(), opencv::Error> {
+    let mut grad_x = Mat::default();
+    let mut grad_y = Mat::default();
+    let mut abs_grad_x = Mat::default();
+    let mut abs_grad_y = Mat::default();
+    let mut gray_image = Mat::default();
+
+    cvt_color(frame, &mut gray_image, COLOR_BGR2GRAY, 0)?;
+
+    sobel(
+        &gray_image,
+        &mut grad_x,
+        CV_16S,
+        1,
+        0,
+        3,
+        1.0,
+        0.0,
+        BORDER_DEFAULT,
+    )?;
+    sobel(
+        &gray_image,
+        &mut grad_y,
+        CV_16S,
+        0,
+        1,
+        3,
+        1.0,
+        0.0,
+        BORDER_DEFAULT,
+    )?;
+
+    convert_scale_abs(&grad_x, &mut abs_grad_x, 1.0, 0.0)?;
+    convert_scale_abs(&grad_y, &mut abs_grad_y, 1.0, 0.0)?;
+
+    add_weighted(&abs_grad_x, 0.5, &abs_grad_y, 0.05, 0.0, frame_out, -1)?;
+
     Ok(())
 }
 
