@@ -3,9 +3,10 @@ use opencv::{
         add_weighted, convert_scale_abs, Size_, BORDER_DEFAULT, CV_16S, CV_8U, ROTATE_90_CLOCKWISE,
     },
     highgui::{self, ButtonCallback, QtButtonTypes, QT_PUSH_BUTTON},
-    imgproc::{canny, cvt_color, gaussian_blur, sobel, COLOR_BGR2GRAY, INTER_AREA},
+    imgproc::{canny, cvt_color, gaussian_blur, resize, sobel, COLOR_BGR2GRAY, INTER_AREA},
     prelude::*,
-    videoio, Result,
+    videoio::{self, VideoWriter, CAP_FFMPEG},
+    Result,
 };
 
 fn main() -> Result<()> {
@@ -25,6 +26,9 @@ fn main() -> Result<()> {
     )?;
 
     // highgui::create_button("Fuzzy", None, 0, false)?;
+
+    let mut video_writer =
+        VideoWriter::new("video.mp4", CAP_FFMPEG, 30.0, Size_::new(256, 256), true)?;
 
     loop {
         cam.read(&mut frame)
@@ -48,14 +52,9 @@ fn main() -> Result<()> {
 
         // apply_mirror(&frame, &mut frame_out)?;
 
-        opencv::imgproc::resize(
-            &frame,
-            &mut frame_out,
-            Size_::new(0, 0),
-            0.5,
-            0.5,
-            INTER_AREA,
-        )?;
+        // apply_resize(&frame, &mut frame_out)?;
+
+        video_writer.write(&frame_out)?;
 
         highgui::imshow("window", &frame_out)?;
         highgui::imshow("original", &frame)?;
@@ -66,7 +65,13 @@ fn main() -> Result<()> {
         }
     }
 
+    video_writer.release()?;
     cam.release()?;
+    Ok(())
+}
+
+fn apply_resize(frame: &Mat, frame_out: &mut Mat) -> Result<(), opencv::Error> {
+    resize(frame, frame_out, Size_::new(0, 0), 0.5, 0.5, INTER_AREA)?;
     Ok(())
 }
 
