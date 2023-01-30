@@ -27,8 +27,15 @@ fn main() -> Result<()> {
 
     // highgui::create_button("Fuzzy", None, 0, false)?;
 
-    let mut video_writer =
-        VideoWriter::new("video.mp4", CAP_FFMPEG, 30.0, Size_::new(256, 256), true)?;
+    let mut video_writer = VideoWriter::new(
+        "target/video.avi",
+        VideoWriter::fourcc('M', 'J', 'P', 'G')?,
+        30.0,
+        Size_::new(cam.get(3)? as i32, cam.get(4)? as i32),
+        true,
+    )?;
+
+    println!("Recording started");
 
     loop {
         cam.read(&mut frame)
@@ -54,9 +61,9 @@ fn main() -> Result<()> {
 
         // apply_resize(&frame, &mut frame_out)?;
 
-        video_writer.write(&frame_out)?;
+        video_writer.write(&frame)?;
 
-        highgui::imshow("window", &frame_out)?;
+        // highgui::imshow("window", &frame_out)?;
         highgui::imshow("original", &frame)?;
 
         let key = highgui::wait_key(1)?;
