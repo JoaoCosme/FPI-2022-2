@@ -27,11 +27,14 @@ fn main() -> Result<()> {
 
     // highgui::create_button("Fuzzy", None, 0, false)?;
 
+    let width = cam.get(3)? as i32;
+    let height = cam.get(4)? as i32;
+
     let mut video_writer = VideoWriter::new(
         "target/video.avi",
         VideoWriter::fourcc('M', 'J', 'P', 'G')?,
         30.0,
-        Size_::new(cam.get(3)? as i32, cam.get(4)? as i32),
+        Size_::new(width, height),
         true,
     )?;
 
