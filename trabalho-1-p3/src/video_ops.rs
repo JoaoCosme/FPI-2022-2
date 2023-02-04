@@ -9,7 +9,7 @@ use opencv::{
     Result,
 };
 
-pub(crate) fn apply_resize(frame: &Mat, frame_out: &mut Mat) -> Result<(), opencv::Error> {
+pub(crate) fn apply_resize_down(frame: &Mat, frame_out: &mut Mat) -> Result<(), opencv::Error> {
     resize(frame, frame_out, Size_::new(0, 0), 0.5, 0.5, INTER_AREA)?;
     Ok(())
 }
@@ -19,8 +19,13 @@ pub(crate) fn apply_mirror(frame: &Mat, frame_out: &mut Mat) -> Result<(), openc
     Ok(())
 }
 
-pub(crate) fn apply_rotation(frame: &Mat, frame_out: &mut Mat) -> Result<(), opencv::Error> {
-    opencv::core::rotate(frame, frame_out, ROTATE_90_CLOCKWISE)?;
+pub(crate) fn apply_rotation(
+    frame_out: &mut Mat,
+    number_of_rots: i32,
+) -> Result<(), opencv::Error> {
+    (0..number_of_rots).for_each(|i: i32| {
+        opencv::core::rotate(&frame_out.clone(), frame_out, ROTATE_90_CLOCKWISE).ok();
+    });
     Ok(())
 }
 
@@ -38,6 +43,15 @@ pub(crate) fn apply_bright_up(
     add_bright: f64,
 ) -> Result<(), opencv::Error> {
     frame.convert_to(frame_out, CV_8U, 1.0, add_bright)?;
+    Ok(())
+}
+
+pub(crate) fn apply_contrast(
+    frame: &Mat,
+    frame_out: &mut Mat,
+    alpha: f64,
+) -> Result<(), opencv::Error> {
+    frame.convert_to(frame_out, CV_8U, alpha, 0.0)?;
     Ok(())
 }
 

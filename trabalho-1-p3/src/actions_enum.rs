@@ -1,5 +1,5 @@
 pub enum actions_enum {
-    Resize,
+    Resize(),
     Mirror,
     Rotation,
     Gray,

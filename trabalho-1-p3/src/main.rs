@@ -18,6 +18,7 @@ fn main() -> Result<()> {
     let mut is_recording = false;
 
     highgui::named_window("window", highgui::WINDOW_FULLSCREEN)?;
+
     let mut kernel_size = 1;
     highgui::create_trackbar(
         "Gaussian",
@@ -37,44 +38,96 @@ fn main() -> Result<()> {
         Size_::new(width, height),
         true,
     )?;
-    let add_bright = 10.0;
+
+    // println!("Select an action:");
+    let mut should_mirror = false;
+    let mut should_neg = false;
+    let mut should_gray = false;
+    let mut should_resize = false;
+    let mut should_canny = false;
+    let mut should_sobel = false;
+    let mut should_record = false;
+
+    let flip_bool = |value: &mut bool| *value = !*value;
+    let stop_start_record = |is_recording: &mut bool| {
+        if *is_recording {
+            println!("Stopping recording!")
+        } else {
+            println!("Start recording!")
+        }
+        flip_bool(is_recording);
+    };
+    let mut rotate = 0;
+    let mut bright = 0.0;
+    let mut contrast = 1.0;
 
     loop {
+        let key = highgui::wait_key(1)?;
+        let char_input = key as u8 as char;
+
         cam.read(&mut frame)
             .expect("Should be able to acquire new frame!");
-
-        is_recording = true;
 
         let mut frame_out = frame.clone();
 
         // video_ops::apply_canny(&frame_out.clone(), &mut frame_out)?;
         // video_ops::apply_sobel(&frame_out.clone(), &mut frame_out)?;
 
+        match char_input {
+            'm' => flip_bool(&mut should_mirror),
+            'n' => flip_bool(&mut should_neg),
+            'g' => flip_bool(&mut should_gray),
+            'r' => rotate += 1,
+            '.' => bright += 10.0,
+            ',' => bright -= 10.0,
+            '=' => contrast += 0.1,
+            '-' => contrast -= 0.1,
+            'z' => flip_bool(&mut should_resize),
+            's' => stop_start_record(&mut should_record),
+            _ => (),
+        }
+
         video_ops::apply_gaussian(&frame_out.clone(), &mut frame_out, kernel_size)?;
-        video_ops::apply_negative(&frame_out.clone(), &mut frame_out)?;
-        video_ops::apply_bright_up(&frame_out.clone(), &mut frame_out, add_bright)?;
-        video_ops::apply_conversion_to_gray(&frame_out.clone(), &mut frame_out)?;
-        video_ops::apply_rotation(&frame_out.clone(), &mut frame_out)?;
-        video_ops::apply_mirror(&frame_out.clone(), &mut frame_out)?;
 
-        // // let apply_contrast = 2.0;
-        // // frame.convert_to(&mut frame_out, CV_8U, apply_contrast, 0.0)?;
+        if should_mirror {
+            video_ops::apply_mirror(&frame_out.clone(), &mut frame_out)?;
+        }
+        if should_neg {
+            video_ops::apply_negative(&frame_out.clone(), &mut frame_out)?;
+        }
 
-        if !is_recording {
-            video_ops::apply_resize(&frame_out.clone(), &mut frame_out)?;
-        } else {
+        if should_gray {
+            video_ops::apply_conversion_to_gray(&frame_out.clone(), &mut frame_out)?;
+        }
+
+        if should_record {
+            if should_resize {
+                flip_bool(&mut should_resize)
+            }
             video_writer.write(&frame_out)?;
         }
+
+        if should_resize {
+            if !is_recording {
+                video_ops::apply_resize_down(&frame_out.clone(), &mut frame_out)?;
+            }
+        }
+
+        video_ops::apply_rotation(&mut frame_out, rotate)?;
+        video_ops::apply_bright_up(&frame_out.clone(), &mut frame_out, bright)?;
+        video_ops::apply_contrast(&frame_out.clone(), &mut frame_out, contrast)?;
+
+        // // let apply_contrast = 2.0;
 
         highgui::imshow("window", &frame_out)?;
         highgui::imshow("original", &frame)?;
 
-        let key = highgui::wait_key(1)?;
         if key == 113 || key == 27 {
             break;
         }
     }
 
+    println!("Recording saved!");
     video_writer.release()?;
     cam.release()?;
     Ok(())
