@@ -15,6 +15,8 @@ fn main() -> Result<()> {
 
     let mut frame = Mat::default();
 
+    let mut is_recording = false;
+
     highgui::named_window("window", highgui::WINDOW_FULLSCREEN)?;
     let mut kernel_size = 1;
     highgui::create_trackbar(
@@ -35,36 +37,36 @@ fn main() -> Result<()> {
         Size_::new(width, height),
         true,
     )?;
-
-    println!("Recording started");
+    let add_bright = 10.0;
 
     loop {
         cam.read(&mut frame)
             .expect("Should be able to acquire new frame!");
 
-        let mut frame_out = Mat::default();
+        is_recording = true;
 
-        // apply_gaussian(&frame, &mut frame_out, kernel_size)?;
-        // apply_canny(&frame, &mut frame_out)?;
-        // apply_sobel(&frame, &mut frame_out)?;
-        // apply_negative(&frame, &mut frame_out)?;
-        // let add_bright = 10.0;
-        // apply_bright_up(&frame, &mut frame_out, add_bright)?;
+        let mut frame_out = frame.clone();
 
-        // let apply_contrast = 2.0;
-        // frame.convert_to(&mut frame_out, CV_8U, apply_contrast, 0.0)?;
+        // video_ops::apply_canny(&frame_out.clone(), &mut frame_out)?;
+        // video_ops::apply_sobel(&frame_out.clone(), &mut frame_out)?;
 
-        // apply_conversion_to_gray(&frame, &mut frame_out)?;
+        video_ops::apply_gaussian(&frame_out.clone(), &mut frame_out, kernel_size)?;
+        video_ops::apply_negative(&frame_out.clone(), &mut frame_out)?;
+        video_ops::apply_bright_up(&frame_out.clone(), &mut frame_out, add_bright)?;
+        video_ops::apply_conversion_to_gray(&frame_out.clone(), &mut frame_out)?;
+        video_ops::apply_rotation(&frame_out.clone(), &mut frame_out)?;
+        video_ops::apply_mirror(&frame_out.clone(), &mut frame_out)?;
 
-        // apply_rotation(&frame, &mut frame_out)?;
+        // // let apply_contrast = 2.0;
+        // // frame.convert_to(&mut frame_out, CV_8U, apply_contrast, 0.0)?;
 
-        // apply_mirror(&frame, &mut frame_out)?;
+        if !is_recording {
+            video_ops::apply_resize(&frame_out.clone(), &mut frame_out)?;
+        } else {
+            video_writer.write(&frame_out)?;
+        }
 
-        // apply_resize(&frame, &mut frame_out)?;
-
-        video_writer.write(&frame)?;
-
-        // highgui::imshow("window", &frame_out)?;
+        highgui::imshow("window", &frame_out)?;
         highgui::imshow("original", &frame)?;
 
         let key = highgui::wait_key(1)?;
