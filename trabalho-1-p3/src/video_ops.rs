@@ -19,6 +19,11 @@ pub(crate) fn apply_mirror(frame: &Mat, frame_out: &mut Mat) -> Result<(), openc
     Ok(())
 }
 
+pub(crate) fn apply_mirror_vertical(frame: &Mat, frame_out: &mut Mat) -> Result<(), opencv::Error> {
+    opencv::core::flip(frame, frame_out, 0)?;
+    Ok(())
+}
+
 pub(crate) fn apply_rotation(
     frame_out: &mut Mat,
     number_of_rots: i32,

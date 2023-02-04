@@ -40,13 +40,14 @@ fn main() -> Result<()> {
     )?;
 
     // println!("Select an action:");
-    let mut should_mirror = false;
+    let mut should_mirror_horizontal = false;
     let mut should_neg = false;
     let mut should_gray = false;
     let mut should_resize = false;
     let mut should_canny = false;
     let mut should_sobel = false;
     let mut should_record = false;
+    let mut should_mirror_vertical = false;
 
     let flip_bool = |value: &mut bool| *value = !*value;
     let stop_start_record = |is_recording: &mut bool| {
@@ -71,7 +72,8 @@ fn main() -> Result<()> {
         let mut frame_out = frame.clone();
 
         match char_input {
-            'm' => flip_bool(&mut should_mirror),
+            'h' => flip_bool(&mut should_mirror_horizontal),
+            'v' => flip_bool(&mut should_mirror_vertical),
             'n' => flip_bool(&mut should_neg),
             'g' => flip_bool(&mut should_gray),
             'r' => rotate += 1,
@@ -90,8 +92,12 @@ fn main() -> Result<()> {
         video_ops::apply_contrast(&frame_out.clone(), &mut frame_out, contrast)?;
         video_ops::apply_gaussian(&frame_out.clone(), &mut frame_out, kernel_size)?;
 
-        if should_mirror {
+        if should_mirror_horizontal {
             video_ops::apply_mirror(&frame_out.clone(), &mut frame_out)?;
+        }
+
+        if should_mirror_vertical {
+            video_ops::apply_mirror_vertical(&frame_out.clone(), &mut frame_out)?;
         }
         if should_neg {
             video_ops::apply_negative(&frame_out.clone(), &mut frame_out)?;
