@@ -23,7 +23,7 @@ pub(crate) fn apply_rotation(
     frame_out: &mut Mat,
     number_of_rots: i32,
 ) -> Result<(), opencv::Error> {
-    (0..number_of_rots).for_each(|i: i32| {
+    (0..number_of_rots % 4).for_each(|i: i32| {
         opencv::core::rotate(&frame_out.clone(), frame_out, ROTATE_90_CLOCKWISE).ok();
     });
     Ok(())
@@ -65,7 +65,7 @@ pub(crate) fn apply_sobel(frame: &Mat, frame_out: &mut Mat) -> Result<(), opencv
     let mut grad_y = Mat::default();
     let mut abs_grad_x = Mat::default();
     let mut abs_grad_y = Mat::default();
-    let mut gray_image = Mat::default();
+    let mut gray_image = frame_out.clone();
 
     pre_processing_gaussian(frame, frame_out)?;
 

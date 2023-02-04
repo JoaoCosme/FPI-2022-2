@@ -70,9 +70,6 @@ fn main() -> Result<()> {
 
         let mut frame_out = frame.clone();
 
-        // video_ops::apply_canny(&frame_out.clone(), &mut frame_out)?;
-        // video_ops::apply_sobel(&frame_out.clone(), &mut frame_out)?;
-
         match char_input {
             'm' => flip_bool(&mut should_mirror),
             'n' => flip_bool(&mut should_neg),
@@ -82,11 +79,15 @@ fn main() -> Result<()> {
             ',' => bright -= 10.0,
             '=' => contrast += 0.1,
             '-' => contrast -= 0.1,
+            'b' => flip_bool(&mut should_sobel),
+            'c' => flip_bool(&mut should_canny),
             'z' => flip_bool(&mut should_resize),
             's' => stop_start_record(&mut should_record),
             _ => (),
         }
 
+        video_ops::apply_bright_up(&frame_out.clone(), &mut frame_out, bright)?;
+        video_ops::apply_contrast(&frame_out.clone(), &mut frame_out, contrast)?;
         video_ops::apply_gaussian(&frame_out.clone(), &mut frame_out, kernel_size)?;
 
         if should_mirror {
@@ -96,8 +97,22 @@ fn main() -> Result<()> {
             video_ops::apply_negative(&frame_out.clone(), &mut frame_out)?;
         }
 
-        if should_gray {
+        if should_gray && !(should_sobel || should_canny) {
             video_ops::apply_conversion_to_gray(&frame_out.clone(), &mut frame_out)?;
+        }
+
+        if should_sobel {
+            if should_gray {
+                should_gray = false;
+            }
+            video_ops::apply_sobel(&frame_out.clone(), &mut frame_out)?;
+        }
+
+        if should_canny {
+            if should_gray {
+                should_gray = false;
+            }
+            video_ops::apply_canny(&frame_out.clone(), &mut frame_out)?;
         }
 
         if should_record {
@@ -114,11 +129,6 @@ fn main() -> Result<()> {
         }
 
         video_ops::apply_rotation(&mut frame_out, rotate)?;
-        video_ops::apply_bright_up(&frame_out.clone(), &mut frame_out, bright)?;
-        video_ops::apply_contrast(&frame_out.clone(), &mut frame_out, contrast)?;
-
-        // // let apply_contrast = 2.0;
-
         highgui::imshow("window", &frame_out)?;
         highgui::imshow("original", &frame)?;
 
