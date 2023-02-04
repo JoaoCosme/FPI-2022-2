@@ -6,7 +6,6 @@ use opencv::{
     Result,
 };
 
-mod actions_enum;
 mod video_ops;
 
 fn main() -> Result<()> {
@@ -14,8 +13,6 @@ fn main() -> Result<()> {
         videoio::VideoCapture::new(0, videoio::CAP_ANY).expect("Should be able to open camera!");
 
     let mut frame = Mat::default();
-
-    let mut is_recording = false;
 
     highgui::named_window("window", highgui::WINDOW_FULLSCREEN)?;
 
@@ -39,7 +36,25 @@ fn main() -> Result<()> {
         true,
     )?;
 
-    // println!("Select an action:");
+    println!(
+        "Pressione uma das teclas abaixo para executar um comando:\n
+    h - espelhar horizontalmente\n
+    v - espelhar verticalmente\n
+    n - inverter os valores de cor\n
+    g - converter para escala de cinza\n
+    r - rotacionar em sentido horário\n
+    . - aumentar brilho em 10 pontos\n
+    , - diminuir brilho em 10 pontos\n
+    = - aumentar contraste em 0,1\n\
+    -   diminuir contraste em 0,1\n
+    b - aplicar filtro de Sobel\n
+    c - aplicar filtro de Canny\n
+    z - redimensionar a imagem\n
+    s - iniciar/parar gravação\n
+    tecla 'q' ou 'esc' - sair do programa\n
+            \n"
+    );
+
     let mut should_mirror_horizontal = false;
     let mut should_neg = false;
     let mut should_gray = false;
@@ -52,9 +67,9 @@ fn main() -> Result<()> {
     let flip_bool = |value: &mut bool| *value = !*value;
     let stop_start_record = |is_recording: &mut bool| {
         if *is_recording {
-            println!("Stopping recording!")
+            println!("Parando gravação!")
         } else {
-            println!("Start recording!")
+            println!("Iniciando gravação")
         }
         flip_bool(is_recording);
     };
@@ -143,7 +158,7 @@ fn main() -> Result<()> {
         }
     }
 
-    println!("Recording saved!");
+    println!("Gravação Salva!");
     video_writer.release()?;
     cam.release()?;
     Ok(())
