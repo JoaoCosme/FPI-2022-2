@@ -6,6 +6,9 @@ use opencv::{
     Result,
 };
 
+mod actions_enum;
+mod video_ops;
+
 fn main() -> Result<()> {
     let mut cam =
         videoio::VideoCapture::new(0, videoio::CAP_ANY).expect("Should be able to open camera!");
