@@ -1,11 +1,8 @@
 use opencv::{
-    core::{
-        Size_, 
-    },
-    highgui::{self, ButtonCallback, QtButtonTypes, QT_PUSH_BUTTON},
-    imgproc::{},
+    core::Size_,
+    highgui::{self},
     prelude::*,
-    videoio::{self, VideoWriter, CAP_FFMPEG},
+    videoio::{self, VideoWriter},
     Result,
 };
 
@@ -77,5 +74,3 @@ fn main() -> Result<()> {
     cam.release()?;
     Ok(())
 }
-
-mod video_ops;
