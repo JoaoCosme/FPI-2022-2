@@ -13,10 +13,10 @@ fn main() -> Result<()> {
         videoio::VideoCapture::new(0, videoio::CAP_ANY).expect("Should be able to open camera!");
 
     let mut frame = Mat::default();
+    let mut kernel_size = 1;
 
     highgui::named_window("window", highgui::WINDOW_FULLSCREEN)?;
 
-    let mut kernel_size = 1;
     highgui::create_trackbar(
         "Gaussian",
         "window",
@@ -27,7 +27,6 @@ fn main() -> Result<()> {
 
     let width = cam.get(3)? as i32;
     let height = cam.get(4)? as i32;
-
     let mut video_writer = VideoWriter::new(
         "target/video.avi",
         VideoWriter::fourcc('M', 'J', 'P', 'G')?,
@@ -103,12 +102,12 @@ fn main() -> Result<()> {
             _ => (),
         }
 
-        video_ops::apply_bright_up(&frame_out.clone(), &mut frame_out, bright)?;
+        video_ops::apply_bright_adjustment(&frame_out.clone(), &mut frame_out, bright)?;
         video_ops::apply_contrast(&frame_out.clone(), &mut frame_out, contrast)?;
         video_ops::apply_gaussian(&frame_out.clone(), &mut frame_out, kernel_size)?;
 
         if should_mirror_horizontal {
-            video_ops::apply_mirror(&frame_out.clone(), &mut frame_out)?;
+            video_ops::apply_mirror_horizontal(&frame_out.clone(), &mut frame_out)?;
         }
 
         if should_mirror_vertical {
@@ -144,7 +143,7 @@ fn main() -> Result<()> {
         }
 
         if should_resize {
-            if !is_recording {
+            if !should_record {
                 video_ops::apply_resize_down(&frame_out.clone(), &mut frame_out)?;
             }
         }

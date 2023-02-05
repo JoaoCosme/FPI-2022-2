@@ -14,7 +14,10 @@ pub(crate) fn apply_resize_down(frame: &Mat, frame_out: &mut Mat) -> Result<(), 
     Ok(())
 }
 
-pub(crate) fn apply_mirror(frame: &Mat, frame_out: &mut Mat) -> Result<(), opencv::Error> {
+pub(crate) fn apply_mirror_horizontal(
+    frame: &Mat,
+    frame_out: &mut Mat,
+) -> Result<(), opencv::Error> {
     opencv::core::flip(frame, frame_out, 1)?;
     Ok(())
 }
@@ -28,7 +31,7 @@ pub(crate) fn apply_rotation(
     frame_out: &mut Mat,
     number_of_rots: i32,
 ) -> Result<(), opencv::Error> {
-    (0..number_of_rots % 4).for_each(|i: i32| {
+    (0..number_of_rots % 4).for_each(|_| {
         opencv::core::rotate(&frame_out.clone(), frame_out, ROTATE_90_CLOCKWISE).ok();
     });
     Ok(())
@@ -42,7 +45,7 @@ pub(crate) fn apply_conversion_to_gray(
     Ok(())
 }
 
-pub(crate) fn apply_bright_up(
+pub(crate) fn apply_bright_adjustment(
     frame: &Mat,
     frame_out: &mut Mat,
     add_bright: f64,
