@@ -12,9 +12,11 @@ Abaixo, segue uma imagem da interface geral, onde podemos ver a imagem original 
 
 ![interface](2023-02-05-10-16-58.png)
 
+<div style="page-break-after: always;"></div>
+
 Mensagem exibida:
 
-```sh
+```text
 Pressione uma das teclas abaixo para executar um comando:
 
     h - espelhar horizontalmente
@@ -45,11 +47,15 @@ Pressione uma das teclas abaixo para executar um comando:
     tecla 'q' ou 'esc' - sair do programa
 ```
 
-Para os seguintes itens, a sua demonstração é encontrada no video no link a seguir, de forma que apenas o item de resize será demonstrado através de _prints_.
+Para os seguintes itens, a sua demonstração é encontrada no video no link a seguir, de forma que apenas os itens de resize e rotação serão demonstrados através de _prints_.
+
+[Link para gravação](https://youtu.be/O-nq8RpvbZ4)
 
 ## Gaussian
 
 Para a aplicação do filtro gaussiano, foi utilizado o método `gaussian_blur` disponibilizado pela biblioteca de processamento de imagem do OpenCv. Para o controle do nível de borramento, foi utilizado uma _trackbar_ para ajustar o tamanho do filtro aplicado. Porém, como a biblioteca requer que o filtro seja quadrado e de dimensões impares, um pequeno tratamento para garantir isso foi aplicado como pode ser visto na função `apply_gaussian` do módulo de video_ops.
+
+<div style="page-break-after: always;"></div>
 
 ## Canny
 
@@ -71,6 +77,8 @@ Para a utilização de operações lineares, foi usado o método `convert_to`, o
 
 A biblioteca OpenCv oferece o método `cvt_color` para realizar a conversão dos tons de uma imagem. Desta forma, uma única linha é necessária para realizar está operação.
 
+<div style="page-break-after: always;"></div>
+
 ## Redimensionamento do Video
 
 O usuário pode reduzir o frame pela metade de seu tamanho original e retornar ao tamanho original. Este comando não pode ser utilizado enquanto o modo de gravação está ativado.
@@ -79,9 +87,19 @@ Isto é executado através do comando `resize` disponibilizado pelo OpenCv. Abai
 
 ![resize](2023-02-05-10-52-11.png)
 
+<div style="page-break-after: always;"></div>
+
 ## Rotação de 90 Graus
 
 O usuário pode rotacionar o video em 90 graus quantas vezes desejar. Para isso, foi utilizado o comando `rotate` aplicado de maneira repetida de acordo com a quantidade de vezes o usuário deseja rotacionar a tela.
+
+Exemplos de rotação:
+
+![rot1](2023-02-05-11-18-47.png)
+
+<div style="page-break-after: always;"></div>
+
+![rot2](2023-02-05-11-19-28.png)
 
 ## Espelhamento de Video
 
@@ -92,6 +110,8 @@ Utilizando o comando `flip` da biblioteca OpenCV, a realização do espelhamento
 OpenCV também oferece um módulo de `VideoWriter` onde podemos gravar videos e salva-los. Este comando foi utilizado para gravar o video disponibilizado acima. A partir do momento do inicio da gravação, não é mais permitido o redimensionamento do vídeo capturado para fins de compatibilidade de tamanho de captura.
 
 Inicialmente, foi verificado que imagens em um único canal não eram corretamente salvas, dessa forma, no caso de uma imagem possuir apenas tons de cinza, primeiro será ajustada para uma imagem em tres canais (sem inferência de cores) utilizando o comando `cvt_color`.
+
+<div style="page-break-after: always;"></div>
 
 ## Conclusão
 
