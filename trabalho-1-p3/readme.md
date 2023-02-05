@@ -75,7 +75,9 @@ A biblioteca OpenCv oferece o método `cvt_color` para realizar a conversão dos
 
 O usuário pode reduzir o frame pela metade de seu tamanho original e retornar ao tamanho original. Este comando não pode ser utilizado enquanto o modo de gravação está ativado.
 
-Isto é executado através do comando `resize` disponibilizado pelo OpenCv.
+Isto é executado através do comando `resize` disponibilizado pelo OpenCv. Abaixo, segue o resultado da aplicação deste processamento:
+
+![resize](2023-02-05-10-52-11.png)
 
 ## Rotação de 90 Graus
 
