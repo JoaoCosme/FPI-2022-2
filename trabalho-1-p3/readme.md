@@ -69,7 +69,7 @@ Para a utilização de operações lineares, foi usado o método `convert_to`, o
 
 ## Tons de Cinza
 
-A biblioteca OpenCv oferece o método `cvt_color` para realizar a conversão dos tons de uma imagem. Utilizando o codigo `COLOR_BGR2GRAY` podemos realizar a conversão em uma única linha.
+A biblioteca OpenCv oferece o método `cvt_color` para realizar a conversão dos tons de uma imagem. Desta forma, uma única linha é necessária para realizar está operação.
 
 ## Redimensionamento do Video
 
@@ -90,6 +90,8 @@ Utilizando o comando `flip` da biblioteca OpenCV, a realização do espelhamento
 ## Gravação de Video
 
 OpenCV também oferece um módulo de `VideoWriter` onde podemos gravar videos e salva-los. Este comando foi utilizado para gravar o video disponibilizado acima. A partir do momento do inicio da gravação, não é mais permitido o redimensionamento do vídeo capturado para fins de compatibilidade de tamanho de captura.
+
+Inicialmente, foi verificado que imagens em um único canal não eram corretamente salvas, dessa forma, no caso de uma imagem possuir apenas tons de cinza, primeiro será ajustada para uma imagem em tres canais (sem inferência de cores) utilizando o comando `cvt_color`.
 
 ## Conclusão
 

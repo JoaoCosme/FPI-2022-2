@@ -1,6 +1,7 @@
 use opencv::{
     core::Size_,
     highgui::{self},
+    imgproc::{cvt_color, COLOR_GRAY2RGB},
     prelude::*,
     videoio::{self, VideoWriter},
     Result,
@@ -139,6 +140,9 @@ fn main() -> Result<()> {
             if should_resize {
                 flip_bool(&mut should_resize)
             }
+
+            adjust_channels(&mut frame_out)?;
+
             video_writer.write(&frame_out)?;
         }
 
@@ -161,4 +165,10 @@ fn main() -> Result<()> {
     video_writer.release()?;
     cam.release()?;
     Ok(())
+}
+
+fn adjust_channels(frame_out: &mut Mat) -> Result<(), opencv::Error> {
+    Ok(if frame_out.channels() < 3 {
+        cvt_color(&frame_out.clone(), frame_out, COLOR_GRAY2RGB, 0)?;
+    })
 }
