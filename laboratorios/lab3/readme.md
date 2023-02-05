@@ -59,6 +59,8 @@ Pelo Teorema da Convolução, pode-se entender que ambas as imagens vistas poder
 
 Como podemos ver nas imagens acima, é possível sim recuperar as imagens originais através da aplicação da transformada inversa de Fourier. Isso se dá devida a linearidade da transformada de Fourier e a preservação da energia original da imagem.
 
+<div style="page-break-after: always;"></div>
+
 ## Transformada Inversa
 
 Os resultados abaixo foram obtidos através do uso do seguinte código:
@@ -149,6 +151,8 @@ Aqui, podemos ver um especto bem mais rico e diverso que o visto anteriormente, 
 
 Suponho que as linhas nas diagonais se formem principalmente devido as transições tanto entre o cameraman e o fundo, como quanto entre a o tripé da camera e o fundo.
 
+<div style="page-break-after: always;"></div>
+
 ## Rotação do Cameraman
 
 Aqui, a seguinte função foi utilizada para os experimentos:
@@ -180,11 +184,15 @@ Abaixo, seguem os resultados para 45, 90 e 120 graus de rotação:
 Imagem 9: Cameraman em 45 graus
 </p>
 
+<div style="page-break-after: always;"></div>
+
 ![90degrees](2023-02-05-15-48-40.png)
 
 <p align = "center">
 Imagem 10: Cameraman em 90 graus
 </p>
+
+<div style="page-break-after: always;"></div>
 
 ![120degrees](2023-02-05-15-49-09.png)
 
