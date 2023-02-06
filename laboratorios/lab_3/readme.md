@@ -35,7 +35,7 @@ function show_image_and_fft(path)
 
 Conforme pode ser visto na imagem abaixo, uma função impulso em 2D é representada por um único pixel na origem (que em 2D se situa em (0,0)). Porém, diferente do que foi visto no domínio frequência, aqui a função impulso está escalada em 255, isso foi realizado para facilitar sua visualização a olho nu, já que um pixel com uma intensidade tão baixa quanto 1 não seria facilmente percebido. Nesta primeira imagem, foi realizado um _zoom_ para que se pudesse verificar o pixel de origem.
 
-![delta origin](2023-02-05-14-45-23.png)
+![delta origin](./pulso.jpg)
 
 <p align = "center">
 Imagem 1: Delta
@@ -43,7 +43,7 @@ Imagem 1: Delta
 
 O mesmo vale para a função constante (White Square). Que no domínio frequência seria um sinal constante de valor _1_.
 
-![white sqr](2023-02-05-14-47-05.png)
+![white sqr](./white_sqr.jpg)
 
 <p align = "center">
 Imagem 2: White Square
@@ -129,7 +129,7 @@ Podemos observar que, ao aplicarmos a transformada de fourier em imagens onde ex
 
 Já aplicando a função `show_image_and_fft`, a imagem `bw_triangle.bmp`, temos o seguinte resultado:
 
-![triangle](2023-02-05-15-36-56.png)
+![triangle](triangle.jpg)
 
 <p align = "center">
 Imagem 7: Triangulo
@@ -150,6 +150,155 @@ Imagem 8: Cameraman
 Aqui, podemos ver um especto bem mais rico e diverso que o visto anteriormente, devido a quantidade de detalhes vistos na imagem original. Agora, podemos começar a perceber a correlação entre algumas fontes originais.
 
 Suponho que as linhas nas diagonais se formem principalmente devido as transições tanto entre o cameraman e o fundo, como quanto entre a o tripé da camera e o fundo.
+
+<div style="page-break-after: always;"></div>
+
+## Operações Lineares no Dominio Frequncia
+
+As operações ponto a ponto lineares, vistas anteriormente no curso, também podem ser aplicadas no dominio frquencia em 2D. Nestes casos, as operações de ajuste de brilho, contraste e obtenção do negativo podem ser vistos a seguir:
+
+### Ajuste de Brilho
+
+O ajuste de brilho pode ser feito apenas deslocando o coeficiente F[0] dos coeficientes de Fourier encontrados para uma imagem.
+
+Este processo foi realizado utilizando o seguinte código:
+
+```matlab
+    figure();
+    subplot(2,2,1);
+    img = imread('cameraman.tif');
+    [rows, columns] = size(img);
+    imshow(img);
+    title('Imagem original');
+    subplot(2,2,2);
+    img_ft = fft2(img);
+    imshow(log(abs(fftshift(img_ft))),[3 10]);
+    title('Espectro');
+    subplot(2,2,3);
+    img_brilho = img_ft;
+    img_brilho(1) =img_brilho(1)+100*rows*columns;
+    imshow(uint8(ifft2(img_brilho)));
+    title('Aumento de brilho');
+    subplot(2,2,4);
+    img_brilho = img_ft;
+    img_brilho(1) =img_brilho(1)-100*rows*columns;
+    imshow(uint8(ifft2(img_brilho)));
+    title('Redução de brilho');
+
+```
+
+<div style="page-break-after: always;"></div>
+
+E o resultado segue abaixo:
+
+![redução_de_brilho](./ajuste_de_brilho.jpg)
+
+<p align = "center">
+Imagem 9: Ajuste de brilho
+</p>
+
+<div style="page-break-after: always;"></div>
+
+## Ajuste de Contraste
+
+Já o ajuste de contraste deve ser aplicado de maneira continua em todos os coeficientes da imagem fonte, para que possamos garantir a homogenização desta operação.
+
+```matlab
+    figure();
+    subplot(2,2,1);
+    imshow(img);
+    title('Imagem original');
+    subplot(2,2,2);
+    img_ft = fft2(img);
+    imshow(log(abs(fftshift(img_ft))),[3 10]);
+    title('Espectro');
+    subplot(2,2,3);
+    img_contraste = img_ft;
+    imshow(uint8(ifft2(img_contraste*1.5)));
+    title('Aumento de ccontraste');
+    subplot(2,2,4);
+    imshow(uint8(ifft2(img_contraste*0.5)));
+    title('Reduçãoo de contraste');
+```
+
+E obtemos o seguinte resultado:
+
+![ajuste de contraste](ajuste_de_contraste.jpg)
+
+<p align = "center">
+Imagem 10: Ajuste de contraste
+</p>
+
+<div style="page-break-after: always;"></div>
+
+### Negativo
+
+A operação de cálculo do negativo de uma imagem é uma combinação das duas operações seguintes: o ganho é aplicado a todos os coeficientes enquanto o bias apenas a F[0].
+
+Desta forma, uma imagem cinza pode ser convertida para negativo com o seguinte código:
+
+```matlab
+    figure();
+    subplot(1,2,1);
+    imshow(img);
+    title('Imagem original');
+    subplot(1,2,2);
+    img_ft = fft2(img);
+    img_ft = - img_ft;
+    img_ft(1) = 255 * rows * columns + img_ft(1);
+    imshow(uint8(ifft2(img_ft)));
+    title('Negativo');
+
+
+```
+
+E o resultado é o seguinte
+![negativo](negative.jpg)
+
+<p align = "center">
+Imagem 11: Calculo de Negativo
+</p>
+
+<div style="page-break-after: always;"></div>
+
+Já em uma imagem colorida, devemos aplicar essa mesma operação em todos os três canais de uma imagem, e em seguida recombina-los para obtermos o negativo de maneira adequada:
+
+```matlab
+    figure();
+    img = imread('kitty.png');
+    [rows, columns, numberOfChannels] = size(img);
+    subplot(1,2,1);
+    imshow(img);
+    title('Imagem original');
+    ft_red = fft2(img(:,:,1));
+    ft_green = fft2(img(:,:,2));
+    ft_blue = fft2(img(:,:,3));
+
+    ft_red = - ft_red;
+    ft_red(1) = 255 * rows * columns + ft_red(1);
+
+    ft_green = - ft_green;
+    ft_green(1) = 255 * rows * columns + ft_green(1);
+
+    ft_blue = - ft_blue;
+    ft_blue(1) = 255 * rows * columns + ft_blue(1);
+
+    reconst = uint8(cat(3, ifft2(ft_red), ifft2(ft_green), ifft2(ft_blue)));
+    subplot(1,2,2);
+    imshow(reconst);
+    title('Negativo');
+
+```
+
+<div style="page-break-after: always;"></div>
+
+Obtendo-se assim, o resultado visto abaixo:
+
+![negativo rgb](negative_Rgb.jpg)
+
+<p align = "center">
+Imagem 12: Calculo de Negativo em RGB
+</p>
 
 <div style="page-break-after: always;"></div>
 
@@ -181,7 +330,7 @@ Abaixo, seguem os resultados para 45, 90 e 120 graus de rotação:
 ![45degrees](2023-02-05-15-48-13.png)
 
 <p align = "center">
-Imagem 9: Cameraman em 45 graus
+Imagem 12: Cameraman em 45 graus
 </p>
 
 <div style="page-break-after: always;"></div>
@@ -189,7 +338,7 @@ Imagem 9: Cameraman em 45 graus
 ![90degrees](2023-02-05-15-48-40.png)
 
 <p align = "center">
-Imagem 10: Cameraman em 90 graus
+Imagem 13: Cameraman em 90 graus
 </p>
 
 <div style="page-break-after: always;"></div>
@@ -197,7 +346,7 @@ Imagem 10: Cameraman em 90 graus
 ![120degrees](2023-02-05-15-49-09.png)
 
 <p align = "center">
-Imagem 11: Cameraman em 120 graus
+Imagem 14: Cameraman em 120 graus
 </p>
 
 Podemos perceber, na rotação de 90 graus, que o espectro da imagem rotacionada em 90 graus corresponde precisamente a se rotação da imagem do espectro da imagem original. Isto é possivel devida a linearidade da transformada de Fourier, onde podemos ver que, mesmo deslocando os pixeis originais, ainda obtivemos a mesma transformada.
