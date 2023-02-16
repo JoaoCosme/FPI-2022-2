@@ -1,0 +1,6 @@
+function quest_dois(image, filter)
+    figure();
+    subplot(2,2,1);
+    imshow(image);
+    filter_adjusted = filter /255;
+end
